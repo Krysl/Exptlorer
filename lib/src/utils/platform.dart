@@ -25,7 +25,7 @@ void loadAccentColor() {
   }
 }
 
-void windowInit() async{
+void windowInit() async {
   if (isDesktop) {
     await flutter_acrylic.Window.initialize();
     if (defaultTargetPlatform == TargetPlatform.windows) {
@@ -43,5 +43,4 @@ void windowInit() async{
       await windowManager.setSkipTaskbar(false);
     });
   }
-
 }

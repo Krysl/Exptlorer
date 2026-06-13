@@ -48,3 +48,6 @@ app.*.map.json
 # build_runner generated code
 *.freezed.dart
 *.g.dart
+
+# flutter_rust_bridge related
+/rust_builder/
