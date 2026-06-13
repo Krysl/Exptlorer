@@ -9,6 +9,9 @@
 .history
 .svn/
 
+# Rust build artifacts (copied for flutter test)
+rust_lib_exptlorer.dll
+
 # IntelliJ related
 *.iml
 *.ipr

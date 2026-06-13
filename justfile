@@ -12,4 +12,4 @@ about:
 br:
   dart run build_runner watch
 frb:
-  flutter_rust_bridge_codegen generate --watch
+  flutter_rust_bridge_codegen generate --watch --dump-all
