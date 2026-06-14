@@ -4,6 +4,7 @@
 // ignore_for_file: unused_import, unused_element, unnecessary_import, duplicate_ignore, invalid_use_of_internal_member, annotate_overrides, non_constant_identifier_names, curly_braces_in_flow_control_structures, prefer_const_literals_to_create_immutables, unused_field
 
 import 'api/disk.dart';
+import 'api/file_icon.dart';
 import 'api/simple.dart';
 import 'dart:async';
 import 'dart:convert';
@@ -57,6 +58,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   DiskRefreshKind dco_decode_box_autoadd_disk_refresh_kind(dynamic raw);
 
   @protected
+  IconData dco_decode_box_autoadd_icon_data(dynamic raw);
+
+  @protected
   DiskKind dco_decode_disk_kind(dynamic raw);
 
   @protected
@@ -64,6 +68,15 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   DiskUsage dco_decode_disk_usage(dynamic raw);
+
+  @protected
+  int dco_decode_i_32(dynamic raw);
+
+  @protected
+  IconData dco_decode_icon_data(dynamic raw);
+
+  @protected
+  IconSize dco_decode_icon_size(dynamic raw);
 
   @protected
   PlatformInt64 dco_decode_isize(dynamic raw);
@@ -76,6 +89,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   Uint8List dco_decode_list_prim_u_8_strict(dynamic raw);
+
+  @protected
+  IconData? dco_decode_opt_box_autoadd_icon_data(dynamic raw);
 
   @protected
   BigInt dco_decode_u_64(dynamic raw);
@@ -125,6 +141,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  IconData sse_decode_box_autoadd_icon_data(SseDeserializer deserializer);
+
+  @protected
   DiskKind sse_decode_disk_kind(SseDeserializer deserializer);
 
   @protected
@@ -132,6 +151,15 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   DiskUsage sse_decode_disk_usage(SseDeserializer deserializer);
+
+  @protected
+  int sse_decode_i_32(SseDeserializer deserializer);
+
+  @protected
+  IconData sse_decode_icon_data(SseDeserializer deserializer);
+
+  @protected
+  IconSize sse_decode_icon_size(SseDeserializer deserializer);
 
   @protected
   PlatformInt64 sse_decode_isize(SseDeserializer deserializer);
@@ -146,6 +174,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer);
 
   @protected
+  IconData? sse_decode_opt_box_autoadd_icon_data(SseDeserializer deserializer);
+
+  @protected
   BigInt sse_decode_u_64(SseDeserializer deserializer);
 
   @protected
@@ -156,9 +187,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   BigInt sse_decode_usize(SseDeserializer deserializer);
-
-  @protected
-  int sse_decode_i_32(SseDeserializer deserializer);
 
   @protected
   void
@@ -201,6 +229,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_box_autoadd_icon_data(
+    IconData self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_disk_kind(DiskKind self, SseSerializer serializer);
 
   @protected
@@ -211,6 +245,15 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_disk_usage(DiskUsage self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_i_32(int self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_icon_data(IconData self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_icon_size(IconSize self, SseSerializer serializer);
 
   @protected
   void sse_encode_isize(PlatformInt64 self, SseSerializer serializer);
@@ -229,6 +272,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_opt_box_autoadd_icon_data(
+    IconData? self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_u_64(BigInt self, SseSerializer serializer);
 
   @protected
@@ -239,9 +288,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_usize(BigInt self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_i_32(int self, SseSerializer serializer);
 }
 
 // Section: wire_class

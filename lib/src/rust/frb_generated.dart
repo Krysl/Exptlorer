@@ -4,6 +4,7 @@
 // ignore_for_file: unused_import, unused_element, unnecessary_import, duplicate_ignore, invalid_use_of_internal_member, annotate_overrides, non_constant_identifier_names, curly_braces_in_flow_control_structures, prefer_const_literals_to_create_immutables, unused_field
 
 import 'api/disk.dart';
+import 'api/file_icon.dart';
 import 'api/simple.dart';
 import 'dart:async';
 import 'dart:convert';
@@ -67,7 +68,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.12.0';
 
   @override
-  int get rustContentHash => 1609507818;
+  int get rustContentHash => -516958877;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -79,34 +80,41 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
 }
 
 abstract class RustLibApi extends BaseApi {
-  Future<BigInt> crateApiDiskDiskInfoAvailableSpace({required DiskInfo that});
+  BigInt crateApiDiskDiskInfoAvailableSpace({required DiskInfo that});
 
-  Future<String> crateApiDiskDiskInfoFileSystem({required DiskInfo that});
+  String crateApiDiskDiskInfoFileSystem({required DiskInfo that});
 
-  Future<bool> crateApiDiskDiskInfoIsReadOnly({required DiskInfo that});
+  bool crateApiDiskDiskInfoIsReadOnly({required DiskInfo that});
 
-  Future<bool> crateApiDiskDiskInfoIsRemovable({required DiskInfo that});
+  bool crateApiDiskDiskInfoIsRemovable({required DiskInfo that});
 
-  Future<DiskKind> crateApiDiskDiskInfoKind({required DiskInfo that});
+  DiskKind crateApiDiskDiskInfoKind({required DiskInfo that});
 
-  Future<String> crateApiDiskDiskInfoMountPoint({required DiskInfo that});
+  String crateApiDiskDiskInfoMountPoint({required DiskInfo that});
 
-  Future<String> crateApiDiskDiskInfoName({required DiskInfo that});
+  String crateApiDiskDiskInfoName({required DiskInfo that});
 
-  Future<bool> crateApiDiskDiskInfoRefresh({required DiskInfo that});
+  bool crateApiDiskDiskInfoRefresh({required DiskInfo that});
 
-  Future<bool> crateApiDiskDiskInfoRefreshSpecifics({
+  bool crateApiDiskDiskInfoRefreshSpecifics({
     required DiskInfo that,
     required DiskRefreshKind refreshes,
   });
 
-  Future<BigInt> crateApiDiskDiskInfoTotalSpace({required DiskInfo that});
+  BigInt crateApiDiskDiskInfoTotalSpace({required DiskInfo that});
 
-  Future<DiskUsage> crateApiDiskDiskInfoUsage({required DiskInfo that});
+  DiskUsage crateApiDiskDiskInfoUsage({required DiskInfo that});
 
   Future<DiskRefreshKind> crateApiDiskDiskRefreshKindEverything();
 
   Future<List<DiskInfo>> crateApiDiskDisks();
+
+  Future<IconData?> crateApiFileIconGetFileIconRgba({required String path});
+
+  Future<IconData?> crateApiFileIconGetFileIconRgbaWithSize({
+    required String path,
+    required IconSize size,
+  });
 
   String crateApiSimpleGreet({required String name});
 
@@ -130,21 +138,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   });
 
   @override
-  Future<BigInt> crateApiDiskDiskInfoAvailableSpace({required DiskInfo that}) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
+  BigInt crateApiDiskDiskInfoAvailableSpace({required DiskInfo that}) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDiskInfo(
             that,
             serializer,
           );
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 1,
-            port: port_,
-          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 1)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_u_64,
@@ -164,21 +167,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<String> crateApiDiskDiskInfoFileSystem({required DiskInfo that}) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
+  String crateApiDiskDiskInfoFileSystem({required DiskInfo that}) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDiskInfo(
             that,
             serializer,
           );
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 2,
-            port: port_,
-          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 2)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_String,
@@ -198,21 +196,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<bool> crateApiDiskDiskInfoIsReadOnly({required DiskInfo that}) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
+  bool crateApiDiskDiskInfoIsReadOnly({required DiskInfo that}) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDiskInfo(
             that,
             serializer,
           );
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 3,
-            port: port_,
-          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 3)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_bool,
@@ -232,21 +225,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<bool> crateApiDiskDiskInfoIsRemovable({required DiskInfo that}) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
+  bool crateApiDiskDiskInfoIsRemovable({required DiskInfo that}) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDiskInfo(
             that,
             serializer,
           );
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 4,
-            port: port_,
-          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 4)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_bool,
@@ -266,21 +254,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<DiskKind> crateApiDiskDiskInfoKind({required DiskInfo that}) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
+  DiskKind crateApiDiskDiskInfoKind({required DiskInfo that}) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDiskInfo(
             that,
             serializer,
           );
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 5,
-            port: port_,
-          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 5)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_disk_kind,
@@ -297,21 +280,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: "DiskInfo_kind", argNames: ["that"]);
 
   @override
-  Future<String> crateApiDiskDiskInfoMountPoint({required DiskInfo that}) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
+  String crateApiDiskDiskInfoMountPoint({required DiskInfo that}) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDiskInfo(
             that,
             serializer,
           );
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 6,
-            port: port_,
-          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 6)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_String,
@@ -331,21 +309,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<String> crateApiDiskDiskInfoName({required DiskInfo that}) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
+  String crateApiDiskDiskInfoName({required DiskInfo that}) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDiskInfo(
             that,
             serializer,
           );
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 7,
-            port: port_,
-          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 7)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_String,
@@ -362,21 +335,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: "DiskInfo_name", argNames: ["that"]);
 
   @override
-  Future<bool> crateApiDiskDiskInfoRefresh({required DiskInfo that}) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
+  bool crateApiDiskDiskInfoRefresh({required DiskInfo that}) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDiskInfo(
             that,
             serializer,
           );
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 8,
-            port: port_,
-          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 8)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_bool,
@@ -393,25 +361,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: "DiskInfo_refresh", argNames: ["that"]);
 
   @override
-  Future<bool> crateApiDiskDiskInfoRefreshSpecifics({
+  bool crateApiDiskDiskInfoRefreshSpecifics({
     required DiskInfo that,
     required DiskRefreshKind refreshes,
   }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDiskInfo(
             that,
             serializer,
           );
           sse_encode_box_autoadd_disk_refresh_kind(refreshes, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 9,
-            port: port_,
-          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 9)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_bool,
@@ -431,21 +394,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<BigInt> crateApiDiskDiskInfoTotalSpace({required DiskInfo that}) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
+  BigInt crateApiDiskDiskInfoTotalSpace({required DiskInfo that}) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDiskInfo(
             that,
             serializer,
           );
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 10,
-            port: port_,
-          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 10)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_u_64,
@@ -465,21 +423,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<DiskUsage> crateApiDiskDiskInfoUsage({required DiskInfo that}) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
+  DiskUsage crateApiDiskDiskInfoUsage({required DiskInfo that}) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerDiskInfo(
             that,
             serializer,
           );
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 11,
-            port: port_,
-          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 11)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_disk_usage,
@@ -554,13 +507,76 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: "disks", argNames: []);
 
   @override
+  Future<IconData?> crateApiFileIconGetFileIconRgba({required String path}) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(path, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 14,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_opt_box_autoadd_icon_data,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiFileIconGetFileIconRgbaConstMeta,
+        argValues: [path],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiFileIconGetFileIconRgbaConstMeta =>
+      const TaskConstMeta(debugName: "get_file_icon_rgba", argNames: ["path"]);
+
+  @override
+  Future<IconData?> crateApiFileIconGetFileIconRgbaWithSize({
+    required String path,
+    required IconSize size,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(path, serializer);
+          sse_encode_icon_size(size, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 15,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_opt_box_autoadd_icon_data,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiFileIconGetFileIconRgbaWithSizeConstMeta,
+        argValues: [path, size],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiFileIconGetFileIconRgbaWithSizeConstMeta =>
+      const TaskConstMeta(
+        debugName: "get_file_icon_rgba_with_size",
+        argNames: ["path", "size"],
+      );
+
+  @override
   String crateApiSimpleGreet({required String name}) {
     return handler.executeSync(
       SyncTask(
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(name, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 14)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 16)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_String,
@@ -585,7 +601,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 15,
+            funcId: 17,
             port: port_,
           );
         },
@@ -666,6 +682,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  IconData dco_decode_box_autoadd_icon_data(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_icon_data(raw);
+  }
+
+  @protected
   DiskKind dco_decode_disk_kind(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     switch (raw[0]) {
@@ -708,6 +730,31 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  int dco_decode_i_32(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as int;
+  }
+
+  @protected
+  IconData dco_decode_icon_data(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 3)
+      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    return IconData(
+      width: dco_decode_i_32(arr[0]),
+      height: dco_decode_i_32(arr[1]),
+      bgraBytes: dco_decode_list_prim_u_8_strict(arr[2]),
+    );
+  }
+
+  @protected
+  IconSize dco_decode_icon_size(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return IconSize.values[raw as int];
+  }
+
+  @protected
   PlatformInt64 dco_decode_isize(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dcoDecodeI64(raw);
@@ -730,6 +777,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   Uint8List dco_decode_list_prim_u_8_strict(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as Uint8List;
+  }
+
+  @protected
+  IconData? dco_decode_opt_box_autoadd_icon_data(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_icon_data(raw);
   }
 
   @protected
@@ -826,6 +879,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  IconData sse_decode_box_autoadd_icon_data(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_icon_data(deserializer));
+  }
+
+  @protected
   DiskKind sse_decode_disk_kind(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
@@ -872,6 +931,32 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  int sse_decode_i_32(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return deserializer.buffer.getInt32();
+  }
+
+  @protected
+  IconData sse_decode_icon_data(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_width = sse_decode_i_32(deserializer);
+    var var_height = sse_decode_i_32(deserializer);
+    var var_bgraBytes = sse_decode_list_prim_u_8_strict(deserializer);
+    return IconData(
+      width: var_width,
+      height: var_height,
+      bgraBytes: var_bgraBytes,
+    );
+  }
+
+  @protected
+  IconSize sse_decode_icon_size(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_i_32(deserializer);
+    return IconSize.values[inner];
+  }
+
+  @protected
   PlatformInt64 sse_decode_isize(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return deserializer.buffer.getPlatformInt64();
@@ -904,6 +989,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  IconData? sse_decode_opt_box_autoadd_icon_data(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_icon_data(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
   BigInt sse_decode_u_64(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return deserializer.buffer.getBigUint64();
@@ -924,12 +1020,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   BigInt sse_decode_usize(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return deserializer.buffer.getBigUint64();
-  }
-
-  @protected
-  int sse_decode_i_32(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return deserializer.buffer.getInt32();
   }
 
   @protected
@@ -1006,6 +1096,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_box_autoadd_icon_data(
+    IconData self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_icon_data(self, serializer);
+  }
+
+  @protected
   void sse_encode_disk_kind(DiskKind self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     switch (self) {
@@ -1037,6 +1136,26 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_u_64(self.writtenBytes, serializer);
     sse_encode_u_64(self.totalReadBytes, serializer);
     sse_encode_u_64(self.readBytes, serializer);
+  }
+
+  @protected
+  void sse_encode_i_32(int self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    serializer.buffer.putInt32(self);
+  }
+
+  @protected
+  void sse_encode_icon_data(IconData self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.width, serializer);
+    sse_encode_i_32(self.height, serializer);
+    sse_encode_list_prim_u_8_strict(self.bgraBytes, serializer);
+  }
+
+  @protected
+  void sse_encode_icon_size(IconSize self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.index, serializer);
   }
 
   @protected
@@ -1072,6 +1191,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_opt_box_autoadd_icon_data(
+    IconData? self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_icon_data(self, serializer);
+    }
+  }
+
+  @protected
   void sse_encode_u_64(BigInt self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     serializer.buffer.putBigUint64(self);
@@ -1092,12 +1224,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   void sse_encode_usize(BigInt self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     serializer.buffer.putBigUint64(self);
-  }
-
-  @protected
-  void sse_encode_i_32(int self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    serializer.buffer.putInt32(self);
   }
 }
 
@@ -1130,7 +1256,7 @@ class DiskInfoImpl extends RustOpaque implements DiskInfo {
   ///     println!("[{:?}] {}B", disk.name(), disk.available_space());
   /// }
   /// ```
-  Future<BigInt> availableSpace() =>
+  BigInt availableSpace() =>
       RustLib.instance.api.crateApiDiskDiskInfoAvailableSpace(that: this);
 
   /// Returns the file system used on this disk (so for example: `EXT4`, `NTFS`, etc...).
@@ -1143,7 +1269,7 @@ class DiskInfoImpl extends RustOpaque implements DiskInfo {
   ///     println!("[{:?}] {:?}", disk.name(), disk.file_system());
   /// }
   /// ```
-  Future<String> fileSystem() =>
+  String fileSystem() =>
       RustLib.instance.api.crateApiDiskDiskInfoFileSystem(that: this);
 
   /// Returns `true` if the disk is read-only.
@@ -1156,7 +1282,7 @@ class DiskInfoImpl extends RustOpaque implements DiskInfo {
   ///     println!("[{:?}] is read-only: {}", disk.name(), disk.is_read_only());
   /// }
   /// ```
-  Future<bool> isReadOnly() =>
+  bool isReadOnly() =>
       RustLib.instance.api.crateApiDiskDiskInfoIsReadOnly(that: this);
 
   /// Returns `true` if the disk is removable.
@@ -1169,7 +1295,7 @@ class DiskInfoImpl extends RustOpaque implements DiskInfo {
   ///     println!("[{:?}] {}", disk.name(), disk.is_removable());
   /// }
   /// ```
-  Future<bool> isRemovable() =>
+  bool isRemovable() =>
       RustLib.instance.api.crateApiDiskDiskInfoIsRemovable(that: this);
 
   /// Returns the kind of disk.
@@ -1182,8 +1308,7 @@ class DiskInfoImpl extends RustOpaque implements DiskInfo {
   ///     println!("[{:?}] {:?}", disk.name(), disk.kind());
   /// }
   /// ```
-  Future<DiskKind> kind() =>
-      RustLib.instance.api.crateApiDiskDiskInfoKind(that: this);
+  DiskKind kind() => RustLib.instance.api.crateApiDiskDiskInfoKind(that: this);
 
   /// Returns the mount point of the disk (`/` for example).
   ///
@@ -1195,7 +1320,7 @@ class DiskInfoImpl extends RustOpaque implements DiskInfo {
   ///     println!("[{:?}] {:?}", disk.name(), disk.mount_point());
   /// }
   /// ```
-  Future<String> mountPoint() =>
+  String mountPoint() =>
       RustLib.instance.api.crateApiDiskDiskInfoMountPoint(that: this);
 
   /// Returns the disk name.
@@ -1208,8 +1333,7 @@ class DiskInfoImpl extends RustOpaque implements DiskInfo {
   ///     println!("{:?}", disk.name());
   /// }
   /// ```
-  Future<String> name() =>
-      RustLib.instance.api.crateApiDiskDiskInfoName(that: this);
+  String name() => RustLib.instance.api.crateApiDiskDiskInfoName(that: this);
 
   /// Updates the disk' information with everything loaded.
   ///
@@ -1223,7 +1347,7 @@ class DiskInfoImpl extends RustOpaque implements DiskInfo {
   ///     disk.refresh();
   /// }
   /// ```
-  Future<bool> refresh() =>
+  bool refresh() =>
       RustLib.instance.api.crateApiDiskDiskInfoRefresh(that: this);
 
   /// Updates the disk's information corresponding to the given [`DiskRefreshKind`].
@@ -1236,7 +1360,7 @@ class DiskInfoImpl extends RustOpaque implements DiskInfo {
   ///     disk.refresh_specifics(DiskRefreshKind::nothing());
   /// }
   /// ```
-  Future<bool> refreshSpecifics({required DiskRefreshKind refreshes}) => RustLib
+  bool refreshSpecifics({required DiskRefreshKind refreshes}) => RustLib
       .instance
       .api
       .crateApiDiskDiskInfoRefreshSpecifics(that: this, refreshes: refreshes);
@@ -1251,7 +1375,7 @@ class DiskInfoImpl extends RustOpaque implements DiskInfo {
   ///     println!("[{:?}] {}B", disk.name(), disk.total_space());
   /// }
   /// ```
-  Future<BigInt> totalSpace() =>
+  BigInt totalSpace() =>
       RustLib.instance.api.crateApiDiskDiskInfoTotalSpace(that: this);
 
   /// Returns number of bytes read and written by the disk
@@ -1264,6 +1388,6 @@ class DiskInfoImpl extends RustOpaque implements DiskInfo {
   ///     println!("[{:?}] disk usage: {:?}", disk.name(), disk.usage());
   /// }
   /// ```
-  Future<DiskUsage> usage() =>
+  DiskUsage usage() =>
       RustLib.instance.api.crateApiDiskDiskInfoUsage(that: this);
 }

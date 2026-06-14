@@ -24,7 +24,7 @@ abstract class DiskInfo implements RustOpaqueInterface {
   ///     println!("[{:?}] {}B", disk.name(), disk.available_space());
   /// }
   /// ```
-  Future<BigInt> availableSpace();
+  BigInt availableSpace();
 
   /// Returns the file system used on this disk (so for example: `EXT4`, `NTFS`, etc...).
   ///
@@ -36,7 +36,7 @@ abstract class DiskInfo implements RustOpaqueInterface {
   ///     println!("[{:?}] {:?}", disk.name(), disk.file_system());
   /// }
   /// ```
-  Future<String> fileSystem();
+  String fileSystem();
 
   /// Returns `true` if the disk is read-only.
   ///
@@ -48,7 +48,7 @@ abstract class DiskInfo implements RustOpaqueInterface {
   ///     println!("[{:?}] is read-only: {}", disk.name(), disk.is_read_only());
   /// }
   /// ```
-  Future<bool> isReadOnly();
+  bool isReadOnly();
 
   /// Returns `true` if the disk is removable.
   ///
@@ -60,7 +60,7 @@ abstract class DiskInfo implements RustOpaqueInterface {
   ///     println!("[{:?}] {}", disk.name(), disk.is_removable());
   /// }
   /// ```
-  Future<bool> isRemovable();
+  bool isRemovable();
 
   /// Returns the kind of disk.
   ///
@@ -72,7 +72,7 @@ abstract class DiskInfo implements RustOpaqueInterface {
   ///     println!("[{:?}] {:?}", disk.name(), disk.kind());
   /// }
   /// ```
-  Future<DiskKind> kind();
+  DiskKind kind();
 
   /// Returns the mount point of the disk (`/` for example).
   ///
@@ -84,7 +84,7 @@ abstract class DiskInfo implements RustOpaqueInterface {
   ///     println!("[{:?}] {:?}", disk.name(), disk.mount_point());
   /// }
   /// ```
-  Future<String> mountPoint();
+  String mountPoint();
 
   /// Returns the disk name.
   ///
@@ -96,7 +96,7 @@ abstract class DiskInfo implements RustOpaqueInterface {
   ///     println!("{:?}", disk.name());
   /// }
   /// ```
-  Future<String> name();
+  String name();
 
   /// Updates the disk' information with everything loaded.
   ///
@@ -110,7 +110,7 @@ abstract class DiskInfo implements RustOpaqueInterface {
   ///     disk.refresh();
   /// }
   /// ```
-  Future<bool> refresh();
+  bool refresh();
 
   /// Updates the disk's information corresponding to the given [`DiskRefreshKind`].
   ///
@@ -122,7 +122,7 @@ abstract class DiskInfo implements RustOpaqueInterface {
   ///     disk.refresh_specifics(DiskRefreshKind::nothing());
   /// }
   /// ```
-  Future<bool> refreshSpecifics({required DiskRefreshKind refreshes});
+  bool refreshSpecifics({required DiskRefreshKind refreshes});
 
   /// Returns the total disk size, in bytes.
   ///
@@ -134,7 +134,7 @@ abstract class DiskInfo implements RustOpaqueInterface {
   ///     println!("[{:?}] {}B", disk.name(), disk.total_space());
   /// }
   /// ```
-  Future<BigInt> totalSpace();
+  BigInt totalSpace();
 
   /// Returns number of bytes read and written by the disk
   ///
@@ -146,7 +146,7 @@ abstract class DiskInfo implements RustOpaqueInterface {
   ///     println!("[{:?}] disk usage: {:?}", disk.name(), disk.usage());
   /// }
   /// ```
-  Future<DiskUsage> usage();
+  DiskUsage usage();
 }
 
 @freezed
@@ -212,6 +212,10 @@ class DiskUsage {
     required this.totalReadBytes,
     required this.readBytes,
   });
+
+  @override
+  String toString() =>
+      'DiskUsage(read: $readBytes/$totalReadBytes, write: $writtenBytes/$totalWrittenBytes)';
 
   @override
   int get hashCode =>
