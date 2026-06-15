@@ -24,9 +24,7 @@ class FileItem extends ConsumerStatefulWidget {
 class _FileItemState extends ConsumerState<FileItem> {
   @override
   Widget build(BuildContext context) {
-    final img = ref.watch(
-      fileIconProvider(widget.entity.path, widget.entity.isDir),
-    );
+    final img = ref.watch(fileIconProvider(widget.entity.path));
     final theme = FluentTheme.of(context);
     final isDark = theme.brightness == .dark;
     return ColoredBox(

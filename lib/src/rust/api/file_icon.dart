@@ -8,27 +8,8 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 // These functions are ignored because they are not marked as `pub`: `get_file_icon_rgba_full`, `icon_to_rgba`
 
-Future<IconData?> getIconRgba({
-  required String path,
-  required bool isFolder,
-  IconSize? size,
-}) => RustLib.instance.api.crateApiFileIconGetIconRgba(
-  path: path,
-  isFolder: isFolder,
-  size: size,
-);
-
-Future<IconData?> getFileIconRgba({required String path, IconSize? size}) =>
-    RustLib.instance.api.crateApiFileIconGetFileIconRgba(
-      path: path,
-      size: size,
-    );
-
-Future<IconData?> getFolderIconRgba({required String path, IconSize? size}) =>
-    RustLib.instance.api.crateApiFileIconGetFolderIconRgba(
-      path: path,
-      size: size,
-    );
+Future<IconData?> getIconRgba({required String path, IconSize? size}) =>
+    RustLib.instance.api.crateApiFileIconGetIconRgba(path: path, size: size);
 
 class IconData {
   final int width;

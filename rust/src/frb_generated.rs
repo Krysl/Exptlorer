@@ -39,7 +39,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.12.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -1909008052;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -1935851893;
 
 // Section: executor
 
@@ -636,78 +636,6 @@ fn wire__crate__api__disk__disks_impl(
         },
     )
 }
-fn wire__crate__api__file_icon__get_file_icon_rgba_impl(
-    port_: flutter_rust_bridge::for_generated::MessagePort,
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "get_file_icon_rgba",
-            port: Some(port_),
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_path = <String>::sse_decode(&mut deserializer);
-            let api_size = <Option<crate::api::file_icon::IconSize>>::sse_decode(&mut deserializer);
-            deserializer.end();
-            move |context| {
-                transform_result_sse::<_, ()>((move || {
-                    let output_ok = Result::<_, ()>::Ok(
-                        crate::api::file_icon::get_file_icon_rgba(api_path, api_size),
-                    )?;
-                    Ok(output_ok)
-                })())
-            }
-        },
-    )
-}
-fn wire__crate__api__file_icon__get_folder_icon_rgba_impl(
-    port_: flutter_rust_bridge::for_generated::MessagePort,
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "get_folder_icon_rgba",
-            port: Some(port_),
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_path = <String>::sse_decode(&mut deserializer);
-            let api_size = <Option<crate::api::file_icon::IconSize>>::sse_decode(&mut deserializer);
-            deserializer.end();
-            move |context| {
-                transform_result_sse::<_, ()>((move || {
-                    let output_ok = Result::<_, ()>::Ok(
-                        crate::api::file_icon::get_folder_icon_rgba(api_path, api_size),
-                    )?;
-                    Ok(output_ok)
-                })())
-            }
-        },
-    )
-}
 fn wire__crate__api__file_icon__get_icon_rgba_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -731,15 +659,12 @@ fn wire__crate__api__file_icon__get_icon_rgba_impl(
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_path = <String>::sse_decode(&mut deserializer);
-            let api_is_folder = <bool>::sse_decode(&mut deserializer);
             let api_size = <Option<crate::api::file_icon::IconSize>>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| {
                 transform_result_sse::<_, ()>((move || {
                     let output_ok = Result::<_, ()>::Ok(crate::api::file_icon::get_icon_rgba(
-                        api_path,
-                        api_is_folder,
-                        api_size,
+                        api_path, api_size,
                     ))?;
                     Ok(output_ok)
                 })())
@@ -1055,17 +980,8 @@ fn pde_ffi_dispatcher_primary_impl(
             data_len,
         ),
         13 => wire__crate__api__disk__disks_impl(port, ptr, rust_vec_len, data_len),
-        14 => {
-            wire__crate__api__file_icon__get_file_icon_rgba_impl(port, ptr, rust_vec_len, data_len)
-        }
-        15 => wire__crate__api__file_icon__get_folder_icon_rgba_impl(
-            port,
-            ptr,
-            rust_vec_len,
-            data_len,
-        ),
-        16 => wire__crate__api__file_icon__get_icon_rgba_impl(port, ptr, rust_vec_len, data_len),
-        18 => wire__crate__api__simple__init_app_impl(port, ptr, rust_vec_len, data_len),
+        14 => wire__crate__api__file_icon__get_icon_rgba_impl(port, ptr, rust_vec_len, data_len),
+        16 => wire__crate__api__simple__init_app_impl(port, ptr, rust_vec_len, data_len),
         _ => unreachable!(),
     }
 }
@@ -1089,7 +1005,7 @@ fn pde_ffi_dispatcher_sync_impl(
         9 => wire__crate__api__disk__DiskInfo_refresh_specifics_impl(ptr, rust_vec_len, data_len),
         10 => wire__crate__api__disk__DiskInfo_total_space_impl(ptr, rust_vec_len, data_len),
         11 => wire__crate__api__disk__DiskInfo_usage_impl(ptr, rust_vec_len, data_len),
-        17 => wire__crate__api__simple__greet_impl(ptr, rust_vec_len, data_len),
+        15 => wire__crate__api__simple__greet_impl(ptr, rust_vec_len, data_len),
         _ => unreachable!(),
     }
 }

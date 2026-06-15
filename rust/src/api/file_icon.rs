@@ -1,14 +1,17 @@
 use std::ffi::OsStr;
 use std::mem;
 use std::os::windows::ffi::OsStrExt;
+use std::sync::Mutex;
 use windows_sys::core::PCWSTR;
+
+// SHGetFileInfoW 和 GDI 操作不是线程安全的，全局锁串行化
+static ICON_LOCK: Mutex<()> = Mutex::new(());
 use windows_sys::Win32::Graphics::Gdi::{
     CreateCompatibleDC, DeleteDC, DeleteObject, GetDIBits, GetObjectW, SelectObject, BITMAP,
     BITMAPINFO, BITMAPINFOHEADER, BI_RGB, DIB_RGB_COLORS, HDC,
 };
 use windows_sys::Win32::UI::Shell::{
     SHGetFileInfoW, SHFILEINFOW, SHGFI_ICON, SHGFI_LARGEICON, SHGFI_SMALLICON,
-    SHGFI_USEFILEATTRIBUTES,
 };
 use windows_sys::Win32::UI::WindowsAndMessaging::{DestroyIcon, GetIconInfo, ICONINFO};
 
@@ -23,37 +26,31 @@ pub enum IconSize {
     Small,
 }
 
-pub fn get_icon_rgba(path: String, is_folder: bool, size: Option<IconSize>) -> Option<IconData> {
-    get_file_icon_rgba_full(path, size.unwrap_or(IconSize::Large), is_folder)
+pub fn get_icon_rgba(path: String, size: Option<IconSize>) -> Option<IconData> {
+    get_file_icon_rgba_full(path, size.unwrap_or(IconSize::Large))
 }
 
-pub fn get_file_icon_rgba(path: String, size: Option<IconSize>) -> Option<IconData> {
-    get_file_icon_rgba_full(path, size.unwrap_or(IconSize::Large), false)
-}
-
-pub fn get_folder_icon_rgba(path: String, size: Option<IconSize>) -> Option<IconData> {
-    get_file_icon_rgba_full(path, size.unwrap_or(IconSize::Large), true)
-}
-
-fn get_file_icon_rgba_full(path: String, size: IconSize, is_dir: bool) -> Option<IconData> {
+fn get_file_icon_rgba_full(path: String, size: IconSize) -> Option<IconData> {
     let wide: Vec<u16> = OsStr::new(&path)
         .encode_wide()
         .chain(std::iter::once(0))
         .collect();
+    // 全局锁：SHGetFileInfoW 和 GDI 非线程安全
+    let _lock = ICON_LOCK.lock().ok()?;
     unsafe {
         let mut info: SHFILEINFOW = mem::zeroed();
         let size_flag = match size {
             IconSize::Large => SHGFI_LARGEICON,
             IconSize::Small => SHGFI_SMALLICON,
         };
-        let attrs = if is_dir { 0x10u32 } else { 0x80u32 };
 
+        // 直接访问真实路径，不设 USEFILEATTRIBUTES，驱动器才能返回正确图标
         let ret = SHGetFileInfoW(
             wide.as_ptr() as PCWSTR,
-            attrs,
+            0,
             &mut info,
             mem::size_of::<SHFILEINFOW>() as u32,
-            SHGFI_ICON | SHGFI_USEFILEATTRIBUTES | size_flag,
+            SHGFI_ICON | size_flag,
         );
         if ret == 0 || info.hIcon.is_null() {
             return None;

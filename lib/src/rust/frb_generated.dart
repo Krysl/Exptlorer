@@ -68,7 +68,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.12.0';
 
   @override
-  int get rustContentHash => -1909008052;
+  int get rustContentHash => -1935851893;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -109,19 +109,8 @@ abstract class RustLibApi extends BaseApi {
 
   Future<List<DiskInfo>> crateApiDiskDisks();
 
-  Future<IconData?> crateApiFileIconGetFileIconRgba({
-    required String path,
-    IconSize? size,
-  });
-
-  Future<IconData?> crateApiFileIconGetFolderIconRgba({
-    required String path,
-    IconSize? size,
-  });
-
   Future<IconData?> crateApiFileIconGetIconRgba({
     required String path,
-    required bool isFolder,
     IconSize? size,
   });
 
@@ -516,7 +505,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: "disks", argNames: []);
 
   @override
-  Future<IconData?> crateApiFileIconGetFileIconRgba({
+  Future<IconData?> crateApiFileIconGetIconRgba({
     required String path,
     IconSize? size,
   }) {
@@ -537,80 +526,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeSuccessData: sse_decode_opt_box_autoadd_icon_data,
           decodeErrorData: null,
         ),
-        constMeta: kCrateApiFileIconGetFileIconRgbaConstMeta,
-        argValues: [path, size],
-        apiImpl: this,
-      ),
-    );
-  }
-
-  TaskConstMeta get kCrateApiFileIconGetFileIconRgbaConstMeta =>
-      const TaskConstMeta(
-        debugName: "get_file_icon_rgba",
-        argNames: ["path", "size"],
-      );
-
-  @override
-  Future<IconData?> crateApiFileIconGetFolderIconRgba({
-    required String path,
-    IconSize? size,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_String(path, serializer);
-          sse_encode_opt_box_autoadd_icon_size(size, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 15,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
-          decodeSuccessData: sse_decode_opt_box_autoadd_icon_data,
-          decodeErrorData: null,
-        ),
-        constMeta: kCrateApiFileIconGetFolderIconRgbaConstMeta,
-        argValues: [path, size],
-        apiImpl: this,
-      ),
-    );
-  }
-
-  TaskConstMeta get kCrateApiFileIconGetFolderIconRgbaConstMeta =>
-      const TaskConstMeta(
-        debugName: "get_folder_icon_rgba",
-        argNames: ["path", "size"],
-      );
-
-  @override
-  Future<IconData?> crateApiFileIconGetIconRgba({
-    required String path,
-    required bool isFolder,
-    IconSize? size,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_String(path, serializer);
-          sse_encode_bool(isFolder, serializer);
-          sse_encode_opt_box_autoadd_icon_size(size, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 16,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
-          decodeSuccessData: sse_decode_opt_box_autoadd_icon_data,
-          decodeErrorData: null,
-        ),
         constMeta: kCrateApiFileIconGetIconRgbaConstMeta,
-        argValues: [path, isFolder, size],
+        argValues: [path, size],
         apiImpl: this,
       ),
     );
@@ -619,7 +536,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiFileIconGetIconRgbaConstMeta =>
       const TaskConstMeta(
         debugName: "get_icon_rgba",
-        argNames: ["path", "isFolder", "size"],
+        argNames: ["path", "size"],
       );
 
   @override
@@ -629,7 +546,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(name, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 17)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 15)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_String,
@@ -654,7 +571,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 18,
+            funcId: 16,
             port: port_,
           );
         },
