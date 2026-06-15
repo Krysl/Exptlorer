@@ -68,7 +68,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.12.0';
 
   @override
-  int get rustContentHash => -516958877;
+  int get rustContentHash => -1909008052;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -109,11 +109,20 @@ abstract class RustLibApi extends BaseApi {
 
   Future<List<DiskInfo>> crateApiDiskDisks();
 
-  Future<IconData?> crateApiFileIconGetFileIconRgba({required String path});
-
-  Future<IconData?> crateApiFileIconGetFileIconRgbaWithSize({
+  Future<IconData?> crateApiFileIconGetFileIconRgba({
     required String path,
-    required IconSize size,
+    IconSize? size,
+  });
+
+  Future<IconData?> crateApiFileIconGetFolderIconRgba({
+    required String path,
+    IconSize? size,
+  });
+
+  Future<IconData?> crateApiFileIconGetIconRgba({
+    required String path,
+    required bool isFolder,
+    IconSize? size,
   });
 
   String crateApiSimpleGreet({required String name});
@@ -507,12 +516,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: "disks", argNames: []);
 
   @override
-  Future<IconData?> crateApiFileIconGetFileIconRgba({required String path}) {
+  Future<IconData?> crateApiFileIconGetFileIconRgba({
+    required String path,
+    IconSize? size,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(path, serializer);
+          sse_encode_opt_box_autoadd_icon_size(size, serializer);
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
@@ -525,26 +538,29 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeErrorData: null,
         ),
         constMeta: kCrateApiFileIconGetFileIconRgbaConstMeta,
-        argValues: [path],
+        argValues: [path, size],
         apiImpl: this,
       ),
     );
   }
 
   TaskConstMeta get kCrateApiFileIconGetFileIconRgbaConstMeta =>
-      const TaskConstMeta(debugName: "get_file_icon_rgba", argNames: ["path"]);
+      const TaskConstMeta(
+        debugName: "get_file_icon_rgba",
+        argNames: ["path", "size"],
+      );
 
   @override
-  Future<IconData?> crateApiFileIconGetFileIconRgbaWithSize({
+  Future<IconData?> crateApiFileIconGetFolderIconRgba({
     required String path,
-    required IconSize size,
+    IconSize? size,
   }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(path, serializer);
-          sse_encode_icon_size(size, serializer);
+          sse_encode_opt_box_autoadd_icon_size(size, serializer);
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
@@ -556,17 +572,54 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeSuccessData: sse_decode_opt_box_autoadd_icon_data,
           decodeErrorData: null,
         ),
-        constMeta: kCrateApiFileIconGetFileIconRgbaWithSizeConstMeta,
+        constMeta: kCrateApiFileIconGetFolderIconRgbaConstMeta,
         argValues: [path, size],
         apiImpl: this,
       ),
     );
   }
 
-  TaskConstMeta get kCrateApiFileIconGetFileIconRgbaWithSizeConstMeta =>
+  TaskConstMeta get kCrateApiFileIconGetFolderIconRgbaConstMeta =>
       const TaskConstMeta(
-        debugName: "get_file_icon_rgba_with_size",
+        debugName: "get_folder_icon_rgba",
         argNames: ["path", "size"],
+      );
+
+  @override
+  Future<IconData?> crateApiFileIconGetIconRgba({
+    required String path,
+    required bool isFolder,
+    IconSize? size,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(path, serializer);
+          sse_encode_bool(isFolder, serializer);
+          sse_encode_opt_box_autoadd_icon_size(size, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 16,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_opt_box_autoadd_icon_data,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiFileIconGetIconRgbaConstMeta,
+        argValues: [path, isFolder, size],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiFileIconGetIconRgbaConstMeta =>
+      const TaskConstMeta(
+        debugName: "get_icon_rgba",
+        argNames: ["path", "isFolder", "size"],
       );
 
   @override
@@ -576,7 +629,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(name, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 16)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 17)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_String,
@@ -601,7 +654,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 17,
+            funcId: 18,
             port: port_,
           );
         },
@@ -685,6 +738,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   IconData dco_decode_box_autoadd_icon_data(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_icon_data(raw);
+  }
+
+  @protected
+  IconSize dco_decode_box_autoadd_icon_size(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_icon_size(raw);
   }
 
   @protected
@@ -786,6 +845,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  IconSize? dco_decode_opt_box_autoadd_icon_size(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_icon_size(raw);
+  }
+
+  @protected
   BigInt dco_decode_u_64(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dcoDecodeU64(raw);
@@ -882,6 +947,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   IconData sse_decode_box_autoadd_icon_data(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_icon_data(deserializer));
+  }
+
+  @protected
+  IconSize sse_decode_box_autoadd_icon_size(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_icon_size(deserializer));
   }
 
   @protected
@@ -1000,6 +1071,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  IconSize? sse_decode_opt_box_autoadd_icon_size(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_icon_size(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
   BigInt sse_decode_u_64(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return deserializer.buffer.getBigUint64();
@@ -1105,6 +1187,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_box_autoadd_icon_size(
+    IconSize self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_icon_size(self, serializer);
+  }
+
+  @protected
   void sse_encode_disk_kind(DiskKind self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     switch (self) {
@@ -1200,6 +1291,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_bool(self != null, serializer);
     if (self != null) {
       sse_encode_box_autoadd_icon_data(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_icon_size(
+    IconSize? self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_icon_size(self, serializer);
     }
   }
 

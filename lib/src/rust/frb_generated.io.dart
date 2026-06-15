@@ -61,6 +61,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   IconData dco_decode_box_autoadd_icon_data(dynamic raw);
 
   @protected
+  IconSize dco_decode_box_autoadd_icon_size(dynamic raw);
+
+  @protected
   DiskKind dco_decode_disk_kind(dynamic raw);
 
   @protected
@@ -92,6 +95,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   IconData? dco_decode_opt_box_autoadd_icon_data(dynamic raw);
+
+  @protected
+  IconSize? dco_decode_opt_box_autoadd_icon_size(dynamic raw);
 
   @protected
   BigInt dco_decode_u_64(dynamic raw);
@@ -144,6 +150,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   IconData sse_decode_box_autoadd_icon_data(SseDeserializer deserializer);
 
   @protected
+  IconSize sse_decode_box_autoadd_icon_size(SseDeserializer deserializer);
+
+  @protected
   DiskKind sse_decode_disk_kind(SseDeserializer deserializer);
 
   @protected
@@ -175,6 +184,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   IconData? sse_decode_opt_box_autoadd_icon_data(SseDeserializer deserializer);
+
+  @protected
+  IconSize? sse_decode_opt_box_autoadd_icon_size(SseDeserializer deserializer);
 
   @protected
   BigInt sse_decode_u_64(SseDeserializer deserializer);
@@ -235,6 +247,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_box_autoadd_icon_size(
+    IconSize self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_disk_kind(DiskKind self, SseSerializer serializer);
 
   @protected
@@ -274,6 +292,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_opt_box_autoadd_icon_data(
     IconData? self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_opt_box_autoadd_icon_size(
+    IconSize? self,
     SseSerializer serializer,
   );
 

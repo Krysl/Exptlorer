@@ -1,19 +1,16 @@
 use std::ffi::OsStr;
-use std::os::windows::ffi::OsStrExt;
 use std::mem;
-use windows_sys::Win32::UI::Shell::{
-    SHGetFileInfoW, SHFILEINFOW, SHGFI_ICON, SHGFI_USEFILEATTRIBUTES,
-    SHGFI_LARGEICON, SHGFI_SMALLICON,
-};
-use windows_sys::Win32::UI::WindowsAndMessaging::{
-    DestroyIcon, GetIconInfo, ICONINFO,
-};
-use windows_sys::Win32::Graphics::Gdi::{
-    CreateCompatibleDC, SelectObject, DeleteDC, DeleteObject,
-    GetDIBits, GetObjectW, BITMAP, BITMAPINFOHEADER, BI_RGB, DIB_RGB_COLORS,
-    BITMAPINFO, HDC,
-};
+use std::os::windows::ffi::OsStrExt;
 use windows_sys::core::PCWSTR;
+use windows_sys::Win32::Graphics::Gdi::{
+    CreateCompatibleDC, DeleteDC, DeleteObject, GetDIBits, GetObjectW, SelectObject, BITMAP,
+    BITMAPINFO, BITMAPINFOHEADER, BI_RGB, DIB_RGB_COLORS, HDC,
+};
+use windows_sys::Win32::UI::Shell::{
+    SHGetFileInfoW, SHFILEINFOW, SHGFI_ICON, SHGFI_LARGEICON, SHGFI_SMALLICON,
+    SHGFI_USEFILEATTRIBUTES,
+};
+use windows_sys::Win32::UI::WindowsAndMessaging::{DestroyIcon, GetIconInfo, ICONINFO};
 
 pub struct IconData {
     pub width: i32,
@@ -21,26 +18,46 @@ pub struct IconData {
     pub bgra_bytes: Vec<u8>,
 }
 
-pub enum IconSize { Large, Small }
-
-pub fn get_file_icon_rgba(path: String) -> Option<IconData> {
-    get_file_icon_rgba_with_size(path, IconSize::Large)
+pub enum IconSize {
+    Large,
+    Small,
 }
 
-pub fn get_file_icon_rgba_with_size(path: String, size: IconSize) -> Option<IconData> {
-    let wide: Vec<u16> = OsStr::new(&path).encode_wide().chain(std::iter::once(0)).collect();
+pub fn get_icon_rgba(path: String, is_folder: bool, size: Option<IconSize>) -> Option<IconData> {
+    get_file_icon_rgba_full(path, size.unwrap_or(IconSize::Large), is_folder)
+}
+
+pub fn get_file_icon_rgba(path: String, size: Option<IconSize>) -> Option<IconData> {
+    get_file_icon_rgba_full(path, size.unwrap_or(IconSize::Large), false)
+}
+
+pub fn get_folder_icon_rgba(path: String, size: Option<IconSize>) -> Option<IconData> {
+    get_file_icon_rgba_full(path, size.unwrap_or(IconSize::Large), true)
+}
+
+fn get_file_icon_rgba_full(path: String, size: IconSize, is_dir: bool) -> Option<IconData> {
+    let wide: Vec<u16> = OsStr::new(&path)
+        .encode_wide()
+        .chain(std::iter::once(0))
+        .collect();
     unsafe {
         let mut info: SHFILEINFOW = mem::zeroed();
         let size_flag = match size {
             IconSize::Large => SHGFI_LARGEICON,
             IconSize::Small => SHGFI_SMALLICON,
         };
+        let attrs = if is_dir { 0x10u32 } else { 0x80u32 };
+
         let ret = SHGetFileInfoW(
-            wide.as_ptr() as PCWSTR, 0, &mut info,
+            wide.as_ptr() as PCWSTR,
+            attrs,
+            &mut info,
             mem::size_of::<SHFILEINFOW>() as u32,
             SHGFI_ICON | SHGFI_USEFILEATTRIBUTES | size_flag,
         );
-        if ret == 0 || info.hIcon.is_null() { return None; }
+        if ret == 0 || info.hIcon.is_null() {
+            return None;
+        }
         let hicon = info.hIcon;
         let result = icon_to_rgba(hicon);
         DestroyIcon(hicon);
@@ -50,18 +67,25 @@ pub fn get_file_icon_rgba_with_size(path: String, size: IconSize) -> Option<Icon
 
 unsafe fn icon_to_rgba(hicon: *mut std::ffi::c_void) -> Option<IconData> {
     let mut icon_info: ICONINFO = mem::zeroed();
-    if GetIconInfo(hicon, &mut icon_info) == 0 { return None; }
+    if GetIconInfo(hicon, &mut icon_info) == 0 {
+        return None;
+    }
 
     let color_bitmap = icon_info.hbmColor;
     let mask_bitmap = icon_info.hbmMask;
 
     let mut bitmap: BITMAP = mem::zeroed();
     let mut get_bmp = |hbm: *mut std::ffi::c_void| -> bool {
-        GetObjectW(hbm as _, mem::size_of::<BITMAP>() as i32, &mut bitmap as *mut _ as *mut _) != 0
+        GetObjectW(
+            hbm as _,
+            mem::size_of::<BITMAP>() as i32,
+            &mut bitmap as *mut _ as *mut _,
+        ) != 0
     };
 
     if !get_bmp(color_bitmap) && !get_bmp(mask_bitmap) {
-        DeleteObject(color_bitmap as _); DeleteObject(mask_bitmap as _);
+        DeleteObject(color_bitmap as _);
+        DeleteObject(mask_bitmap as _);
         return None;
     }
 
@@ -71,7 +95,8 @@ unsafe fn icon_to_rgba(hicon: *mut std::ffi::c_void) -> Option<IconData> {
 
     let hdc: HDC = CreateCompatibleDC(std::ptr::null_mut());
     if hdc.is_null() {
-        DeleteObject(color_bitmap as _); DeleteObject(mask_bitmap as _);
+        DeleteObject(color_bitmap as _);
+        DeleteObject(mask_bitmap as _);
         return None;
     }
 
@@ -84,20 +109,30 @@ unsafe fn icon_to_rgba(hicon: *mut std::ffi::c_void) -> Option<IconData> {
     bmi_header.biBitCount = bpp;
     bmi_header.biCompression = BI_RGB;
 
-    let bmi = BITMAPINFO { bmiHeader: bmi_header, bmiColors: [Default::default()] };
+    let bmi = BITMAPINFO {
+        bmiHeader: bmi_header,
+        bmiColors: [Default::default()],
+    };
     let row_size = (width * (bpp as i32) + 31) / 32 * 4;
     let pixel_count = (row_size * height) as usize;
     let mut raw_bgra: Vec<u8> = vec![0u8; pixel_count];
 
     let old_bmp = SelectObject(hdc, color_bitmap as _);
     if old_bmp.is_null() {
-        DeleteDC(hdc); DeleteObject(color_bitmap as _); DeleteObject(mask_bitmap as _);
+        DeleteDC(hdc);
+        DeleteObject(color_bitmap as _);
+        DeleteObject(mask_bitmap as _);
         return None;
     }
 
     let success = GetDIBits(
-        hdc, color_bitmap as _, 0, height as u32,
-        raw_bgra.as_mut_ptr() as _, &bmi as *const _ as *mut _, DIB_RGB_COLORS,
+        hdc,
+        color_bitmap as _,
+        0,
+        height as u32,
+        raw_bgra.as_mut_ptr() as _,
+        &bmi as *const _ as *mut _,
+        DIB_RGB_COLORS,
     );
 
     SelectObject(hdc, old_bmp);
@@ -105,7 +140,13 @@ unsafe fn icon_to_rgba(hicon: *mut std::ffi::c_void) -> Option<IconData> {
     DeleteObject(color_bitmap as _);
     DeleteObject(mask_bitmap as _);
 
-    if success == 0 { return None; }
+    if success == 0 {
+        return None;
+    }
 
-    Some(IconData { width, height, bgra_bytes: raw_bgra })
+    Some(IconData {
+        width,
+        height,
+        bgra_bytes: raw_bgra,
+    })
 }

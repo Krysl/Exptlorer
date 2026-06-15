@@ -1,8 +1,9 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:ui' as ui;
 
-import 'package:exptlorer/src/rust/api/file_icon.dart' hide IconData;
-import 'package:flutter/widgets.dart';
+import 'package:exptlorer/src/rust/api/file_icon.dart';
+import 'package:flutter/widgets.dart' hide IconData;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'file_icon.g.dart';
@@ -11,11 +12,15 @@ part 'file_icon.g.dart';
 /// [issue & work around](https://github.com/rrousselGit/riverpod/issues/4372)
 typedef UiImage = ui.Image;
 
+extension TypeCheck on FileSystemEntity{
+  bool get isDir => this is Directory;
+}
+
 @riverpod
 class FileIcon extends _$FileIcon {
   @override
-  FutureOr<UiImage?> build(String path) async {
-    final icon = await getFileIconRgba(path: path);
+  FutureOr<UiImage?> build(String path, [bool isFolder = false]) async {
+    final icon = await getIconRgba(isFolder: isFolder, path: path);
 
     if (icon == null) return null;
 
