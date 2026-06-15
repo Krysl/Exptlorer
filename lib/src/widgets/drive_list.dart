@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:exptlorer/src/model/drives.dart';
 import 'package:exptlorer/src/model/file_icon.dart';
 import 'package:exptlorer/src/utils/num.dart';
@@ -32,7 +34,7 @@ class _DriveItemState extends ConsumerState<DriveItem> {
     final isDark = FluentTheme.of(context).brightness == .dark;
     return Card(
       backgroundColor: (widget.isHovered || widget.isSelected)
-          ? (isDark? Colors.grey[130]:Colors.grey[30])
+          ? (isDark ? Colors.grey[130] : Colors.grey[30])
           : null,
       child: Tooltip(
         message: widget.drive.toString(),
@@ -105,7 +107,7 @@ class DriveList extends StatefulWidget {
   });
 
   final Drives drives;
-  final void Function(String? path)? onTapWithoutModifierKeys;
+  final void Function(FileSystemEntity? path)? onTapWithoutModifierKeys;
   final bool showRightGuide;
 
   @override
@@ -129,7 +131,7 @@ class _DriveListState extends State<DriveList> {
               isHovered: isHovered,
             );
           },
-          path: (index) => drives[index].mountPoint,
+          path: (index) => Directory(drives[index].mountPoint),
           isDir: (_) => true,
           showRightGuide: widget.showRightGuide,
           onTapWithoutModifierKeys: widget.onTapWithoutModifierKeys,

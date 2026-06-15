@@ -15,7 +15,7 @@ part 'miller_columns.freezed.dart';
 
 class MillerColumnState {
   /// if (path==null) { show(DriveList);}
-  final String? path;
+  final FileSystemEntity? path;
 
   MillerColumnState({required this.path});
   MillerColumnState.drives() : this(path: null);
@@ -94,6 +94,7 @@ class MillerColumnsController extends _$MillerColumnsController {
   }
 
   List<Widget> buildChildren(
+    BuildContext context,
     BoxConstraints constraints,
     MillerColumnsSize size,
     Drives drives,
@@ -114,12 +115,14 @@ class MillerColumnsController extends _$MillerColumnsController {
                 ? DriveList(
                     drives: drives,
                     showRightGuide: index < state.length - 1,
-                    onTapWithoutModifierKeys: (path) => openAside(index, path),
+                    onTapWithoutModifierKeys: (path) =>
+                        openAside(context, index, path),
                   )
                 : FileList(
-                    dir: Directory(c.path!),
+                    dir: c.path! as Directory,
                     showRightGuide: index < state.length - 1,
-                    onTapWithoutModifierKeys: (path) => openAside(index, path),
+                    onTapWithoutModifierKeys: (path) =>
+                        openAside(context, index, path),
                   ),
           ),
         ),
@@ -129,17 +132,38 @@ class MillerColumnsController extends _$MillerColumnsController {
     return children;
   }
 
-  void openAside(int index, String? path) {
+  // ignore: riverpod_lint/avoid_build_context_in_providers
+  void openAside(BuildContext context, int index, FileSystemEntity? path) {
     var newState = state;
     if (state.length > index) {
       newState = state.copyWith(base: state.sublist(0, index + 1));
-      if (path != null) {
-        newState.add(MillerColumnState(path: path));
+      if (path != null && path is Directory) {
+        final stat = path.statSync();
+        if (stat.type != FileSystemEntityType.notFound) {
+          newState.add(MillerColumnState(path: path));
+        } else {
+          showError(context, '拒绝访问', '');
+        }
       }
       state = newState;
     }
     print('onTap: $state');
   }
+
+  // ignore: riverpod_lint/avoid_build_context_in_providers
+  void showError(BuildContext context, String title, String? msg) =>
+      displayInfoBar(
+        context,
+        builder: (context, close) => InfoBar(
+          title: Text(title),
+          content: msg != null ? Text(msg) : null,
+          action: IconButton(
+            icon: const WindowsIcon(WindowsIcons.clear),
+            onPressed: close,
+          ),
+          severity: InfoBarSeverity.warning,
+        ),
+      );
 }
 
 @freezed
@@ -194,6 +218,7 @@ class _MillerColumnsState extends ConsumerState<MillerColumns> {
       builder: (context, constraints) => Stack(
         clipBehavior: Clip.hardEdge,
         children: widget.controller.buildChildren(
+          context,
           constraints,
           widget.size,
           widget.drives,

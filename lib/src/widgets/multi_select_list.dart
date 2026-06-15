@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -24,9 +26,9 @@ class MultiSelectList extends StatefulWidget {
 
   final int itemCount;
   final Widget Function(int index, bool isSelected, bool isHovered) itemBuilder;
-  final String Function(int index) path;
+  final FileSystemEntity Function(int index) path;
   final bool Function(int index) isDir;
-  final void Function(String? path)? onTapWithoutModifierKeys;
+  final void Function(FileSystemEntity? path)? onTapWithoutModifierKeys;
   final double strokeWidth;
   final double cornerRadius;
 
