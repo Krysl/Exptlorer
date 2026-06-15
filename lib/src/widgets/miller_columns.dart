@@ -90,7 +90,7 @@ class MillerColumnsController extends _$MillerColumnsController {
         return (offset: ofst, width: w);
       });
     }
-    throw UnimplementedError();
+    throw UnimplementedError('calcWidths');
   }
 
   List<Widget> buildChildren(

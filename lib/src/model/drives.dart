@@ -8,13 +8,14 @@ part 'drives.freezed.dart';
 
 enum DriveKind {
   hdd,
-  sdd;
+  sdd,
+  unknow;
 
   static DriveKind fromDiskKind(DiskKind kind) {
     return switch (kind) {
       DiskKind_HDD() => DriveKind.hdd,
       DiskKind_SSD() => DriveKind.sdd,
-      DiskKind_Unknown() => throw UnimplementedError(),
+      DiskKind_Unknown() => DriveKind.unknow,
     };
   }
 }

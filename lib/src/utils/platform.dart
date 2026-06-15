@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:exptlorer/src/app.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_acrylic/flutter_acrylic.dart' as flutter_acrylic;
 import 'package:system_theme/system_theme.dart';
@@ -33,6 +34,7 @@ void windowInit() async {
     }
     await WindowManager.instance.ensureInitialized();
     windowManager.waitUntilReadyToShow().then((_) async {
+      await windowManager.setTitle(appTitle);
       await windowManager.setTitleBarStyle(
         TitleBarStyle.hidden,
         windowButtonVisibility: false,

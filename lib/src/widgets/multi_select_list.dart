@@ -2,10 +2,58 @@ import 'dart:io';
 
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:exptlorer/src/utils/num.dart';
 
 import 'hover_scrollbar.dart';
+import '../actions/actions.dart';
+
+/// Holds multi-selection state and notifies listeners on change.
+class MultiSelectController extends ChangeNotifier {
+  List<bool> _selected = [];
+  int _lastSelected = 0;
+
+  FileSystemEntity Function(int)? indexToEntity;
+
+  int get lastSelected => _lastSelected;
+  bool isSelected(int index) => _selected[index];
+
+  Iterable<int> get selectedIndices sync* {
+    for (int i = 0; i < _selected.length; i++) {
+      if (_selected[i]) yield i;
+    }
+  }
+
+  Iterable<FileSystemEntity> get selectedEntitys => //
+      selectedIndices.map(indexToEntity!);
+
+  void syncLength(int length) {
+    if (_selected.length != length) {
+      _selected = List.filled(length, false);
+      _lastSelected = 0;
+      notifyListeners();
+    }
+  }
+
+  void setSelected(int index, bool value) {
+    _selected[index] = value;
+    notifyListeners();
+  }
+
+  void fillRange(int start, int end, bool value) {
+    _selected.fillRange(start, end, value);
+    notifyListeners();
+  }
+
+  void setLastSelected(int index) {
+    _lastSelected = index;
+    notifyListeners();
+  }
+
+  void clear() {
+    _selected.fillRange(0, _selected.length, false);
+    notifyListeners();
+  }
+}
 
 /// A list widget that supports multi-selection via Ctrl/Shift click.
 ///
@@ -19,6 +67,7 @@ class MultiSelectList extends StatefulWidget {
     required this.path,
     required this.isDir,
     this.onTapWithoutModifierKeys,
+    this.controller,
     this.showRightGuide = false,
     this.strokeWidth = 3,
     this.cornerRadius = 6,
@@ -29,6 +78,7 @@ class MultiSelectList extends StatefulWidget {
   final FileSystemEntity Function(int index) path;
   final bool Function(int index) isDir;
   final void Function(FileSystemEntity? path)? onTapWithoutModifierKeys;
+  final MultiSelectController? controller;
   final double strokeWidth;
   final double cornerRadius;
 
@@ -41,26 +91,31 @@ class MultiSelectList extends StatefulWidget {
 }
 
 class _MultiSelectListState extends State<MultiSelectList> {
-  List<bool> _selected = [];
-  int _lastSelected = 0;
+  late final MultiSelectController _ctrl;
+  final _focusNode = FocusNode();
   int? _hoveredIndex;
   final List<GlobalKey> _itemKeys = [];
   final _paintKey = GlobalKey();
   final ScrollController _scrollController = ScrollController();
   final ValueNotifier<int> _repaintNotifier = ValueNotifier(0);
 
+  MultiSelectController get _effectiveCtrl => widget.controller ?? _ctrl;
+
   @override
   void initState() {
     super.initState();
-    _selected = List.filled(widget.itemCount, false);
+    _ctrl = MultiSelectController();
+    _effectiveCtrl.syncLength(widget.itemCount);
     _syncKeys();
     _scrollController.addListener(() => _repaintNotifier.value++);
+    _ctrl.indexToEntity ??= widget.path;
   }
 
   @override
   void dispose() {
     _scrollController.dispose();
     _repaintNotifier.dispose();
+    _ctrl.dispose();
     super.dispose();
   }
 
@@ -79,67 +134,91 @@ class _MultiSelectListState extends State<MultiSelectList> {
   }
 
   void _syncLength() {
-    if (_selected.length != widget.itemCount) {
-      _selected = List.filled(widget.itemCount, false);
-      _syncKeys();
-      _lastSelected = 0;
-    }
+    _effectiveCtrl.syncLength(widget.itemCount);
+    _syncKeys();
   }
 
   void _select(int index) {
+    final ctrl = _effectiveCtrl;
     final instance = HardwareKeyboard.instance;
     if (instance.isControlPressed) {
-      _selected[index] = !_selected[index];
-      _lastSelected = index;
+      ctrl.setSelected(index, !ctrl.isSelected(index));
+      ctrl.setLastSelected(index);
     } else if (instance.isShiftPressed) {
-      _selected.fillRange(0, _selected.length, false);
-      final (start, end) = sort2(_lastSelected, index);
-      _selected.fillRange(start, end + 1, true);
+      ctrl.clear();
+      final (start, end) = sort2(ctrl.lastSelected, index);
+      ctrl.fillRange(start, end + 1, true);
     } else {
-      _selected.fillRange(0, _selected.length, false);
-      _selected[index] = true;
-      _lastSelected = index;
+      ctrl.clear();
+      ctrl.setSelected(index, true);
+      ctrl.setLastSelected(index);
       widget.onTapWithoutModifierKeys?.call(
         widget.isDir(index) ? widget.path(index) : null,
       );
     }
-    setState(() => _repaintNotifier.value++);
+    _focusNode.requestFocus();
   }
 
   @override
   Widget build(BuildContext context) {
     _syncLength();
-    final list = HoverScrollbar(
+    Widget list = HoverScrollbar(
       controller: _scrollController,
-      onTap: () => widget.onTapWithoutModifierKeys?.call(null),
       thinThickness: widget.strokeWidth,
       thickThickness: widget.strokeWidth * 2.5,
       radius: widget.cornerRadius,
-      child: ListView.builder(
-          controller: _scrollController,
-          itemCount: widget.itemCount,
-          itemBuilder: (ctx, index) {
-            final isSel = _selected[index];
-            return MouseRegion(
-              onEnter: (_) => setState(() => _hoveredIndex = index),
-              onExit: (_) => setState(() => _hoveredIndex = null),
-              child: GestureDetector(
-                onTapDown: (details) => _select(index),
-                child: Padding(
-                  key: _itemKeys[index],
-                  padding: EdgeInsets.only(
-                    left: widget.strokeWidth,
-                    top: widget.strokeWidth / 2,
-                    bottom: widget.strokeWidth / 2,
+      child: CustomScrollView(
+        controller: _scrollController,
+        slivers: [
+          SliverList(
+            delegate: SliverChildBuilderDelegate((ctx, index) {
+              final isSel = _effectiveCtrl.isSelected(index);
+              return MouseRegion(
+                onEnter: (_) => setState(() => _hoveredIndex = index),
+                onExit: (_) => setState(() => _hoveredIndex = null),
+                child: GestureDetector(
+                  onTapUp: (details) => _select(index),
+                  onDoubleTap: () {
+                    _select(index);
+                    Actions.handler<OpenIntent>(
+                      ctx,
+                      const OpenIntent(),
+                    )?.call();
+                  },
+                  child: Padding(
+                    key: _itemKeys[index],
+                    padding: EdgeInsets.only(
+                      left: widget.strokeWidth,
+                      top: widget.strokeWidth / 2,
+                      bottom: widget.strokeWidth / 2,
+                    ),
+                    child: widget.itemBuilder(
+                      index,
+                      isSel,
+                      _hoveredIndex == index,
+                    ),
                   ),
-                  child: widget.itemBuilder(
-                      index, isSel, _hoveredIndex == index),
                 ),
-              ),
-            );
-          },
-        ),
-      );
+              );
+            }, childCount: widget.itemCount),
+          ),
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onTap: () => widget.onTapWithoutModifierKeys?.call(null),
+              child: const SizedBox.expand(),
+            ),
+          ),
+        ],
+      ),
+    );
+    list = Actions(
+      actions: <Type, Action<Intent>>{
+        OpenIntent: OpenAction(controller: _effectiveCtrl),
+      },
+      child: Focus(focusNode: _focusNode, child: list),
+    );
     if (!widget.showRightGuide) return list;
     final theme = FluentTheme.of(context);
     return CustomPaint(
@@ -147,7 +226,7 @@ class _MultiSelectListState extends State<MultiSelectList> {
       foregroundPainter: _GuideOverlayPainter(
         repaint: _repaintNotifier,
         paintKey: _paintKey,
-        gapItemKey: _itemKeys[_lastSelected],
+        gapItemKey: _itemKeys[_effectiveCtrl.lastSelected],
         color: theme.accentColor,
         strokeWidth: widget.strokeWidth,
         cornerRadius: widget.cornerRadius,
@@ -156,7 +235,6 @@ class _MultiSelectListState extends State<MultiSelectList> {
     );
   }
 }
-
 
 /// Draws the right guide line and selected border at the top level.
 class _GuideOverlayPainter extends CustomPainter {
@@ -206,13 +284,13 @@ class _GuideOverlayPainter extends CustomPainter {
       if (sourceRect.top > 0) {
         canvas.drawLine(
           Offset(rightX, 0),
-          Offset(rightX, sourceRect.top - cornerRadius+1),
+          Offset(rightX, sourceRect.top - cornerRadius + 1),
           paint,
         );
       }
       if (sourceRect.bottom < size.height) {
         canvas.drawLine(
-          Offset(rightX, sourceRect.bottom + cornerRadius-1),
+          Offset(rightX, sourceRect.bottom + cornerRadius - 1),
           Offset(rightX, size.height),
           paint,
         );

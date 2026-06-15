@@ -8,7 +8,6 @@ class HoverScrollbar extends StatefulWidget {
     super.key,
     required this.controller,
     required this.child,
-    this.onTap,
     this.thinThickness = 4,
     this.thickThickness = 8,
     this.radius = 4,
@@ -16,7 +15,6 @@ class HoverScrollbar extends StatefulWidget {
 
   final ScrollController controller;
   final Widget child;
-  final VoidCallback? onTap;
   final double thinThickness;
   final double thickThickness;
   final double radius;
@@ -88,24 +86,21 @@ class HoverScrollbarState extends State<HoverScrollbar>
             }
             _overThumb = x >= width - widget.thickThickness * 1.5;
           },
-          child: GestureDetector(
-            onTap: widget.onTap,
-            child: ScrollConfiguration(
-              behavior: _NoScrollbarBehavior(),
-              child: RawScrollbar(
-                controller: widget.controller,
-                trackVisibility: _listHovered,
-                trackColor: isDark ? Colors.grey[140] : Colors.grey[40],
-                trackBorderColor: isDark ? Colors.grey[120] : Colors.grey[60],
-                thumbVisibility: _listHovered,
-                thumbColor: _overThumb
-                    ? (isDark ? Colors.grey[100] : Colors.grey[80])
-                    : (isDark ? Colors.grey[140] : Colors.grey[40]),
-                thickness: thickness,
-                radius: Radius.circular(widget.radius),
-                fadeDuration: const Duration(milliseconds: 200),
-                child: widget.child,
-              ),
+          child: ScrollConfiguration(
+            behavior: _NoScrollbarBehavior(),
+            child: RawScrollbar(
+              controller: widget.controller,
+              trackVisibility: _listHovered,
+              trackColor: isDark ? Colors.grey[140] : Colors.grey[40],
+              trackBorderColor: isDark ? Colors.grey[120] : Colors.grey[60],
+              thumbVisibility: _listHovered,
+              thumbColor: _overThumb
+                  ? (isDark ? Colors.grey[100] : Colors.grey[80])
+                  : (isDark ? Colors.grey[140] : Colors.grey[40]),
+              thickness: thickness,
+              radius: Radius.circular(widget.radius),
+              fadeDuration: const Duration(milliseconds: 200),
+              child: widget.child,
             ),
           ),
         );

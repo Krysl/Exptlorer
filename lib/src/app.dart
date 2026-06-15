@@ -1,10 +1,12 @@
+import 'package:exptlorer/src/actions/open.dart';
 import 'package:exptlorer/src/setting/theme/theme.dart';
 import 'package:exptlorer/src/window.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_acrylic/flutter_acrylic.dart' as flutter_acrylic;
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-const String appTitle = 'Exptlorer';
+const String appTitle = 'Expᵗlorer';
 
 class MyApp extends ConsumerWidget {
   const MyApp({super.key});
@@ -23,7 +25,7 @@ class MyApp extends ConsumerWidget {
       theme: appTheme.getTheme(false, context),
       locale: appThemeData.locale,
       builder: (final context, final child) {
-        return Directionality(
+        final widget = Directionality(
           textDirection: appThemeData.textDirection,
           child: NavigationPaneTheme(
             data: NavigationPaneThemeData(
@@ -35,6 +37,12 @@ class MyApp extends ConsumerWidget {
             ),
             child: child!,
           ),
+        );
+        return Shortcuts(
+          shortcuts: <LogicalKeySet, Intent>{
+            LogicalKeySet(LogicalKeyboardKey.enter): const OpenIntent(),
+          },
+          child: widget,
         );
       },
       home: const Window(appTitle: appTitle),
