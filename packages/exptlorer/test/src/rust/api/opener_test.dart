@@ -10,6 +10,6 @@ void main() {
     await openPath(path: r'C:\Windows\Web\Wallpaper\Windows\img0.jpg');
   });
   test('open url', () async {
-    await openUrl(url: r'https://www.google.com/');
+    await openUrl(url: 'https://www.google.com/');
   });
 }

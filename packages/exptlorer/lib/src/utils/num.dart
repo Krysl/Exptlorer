@@ -3,7 +3,7 @@ extension BigIntHelpers on BigInt {
     if (isValidInt) {
       return toInt();
     }
-    throw Exception("BigInt $this is not valid int");
+    throw Exception('BigInt $this is not valid int');
   }
 }
 

@@ -35,4 +35,7 @@ class IconData {
           bgraBytes == other.bgraBytes;
 }
 
-enum IconSize { large, small }
+enum IconSize {
+  large,
+  small,
+}

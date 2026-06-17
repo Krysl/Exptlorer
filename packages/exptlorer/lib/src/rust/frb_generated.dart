@@ -6,7 +6,6 @@
 import 'api/disk.dart';
 import 'api/file_icon.dart';
 import 'api/opener.dart';
-import 'api/simple.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'frb_generated.dart';
@@ -38,8 +37,12 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
 
   /// Initialize flutter_rust_bridge in mock mode.
   /// No libraries for FFI are loaded.
-  static void initMock({required RustLibApi api}) {
-    instance.initMockImpl(api: api);
+  static void initMock({
+    required RustLibApi api,
+  }) {
+    instance.initMockImpl(
+      api: api,
+    );
   }
 
   /// Dispose flutter_rust_bridge
@@ -69,12 +72,12 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.12.0';
 
   @override
-  int get rustContentHash => -1784971220;
+  int get rustContentHash => 1932602608;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
         stem: 'rust_lib_exptlorer',
-        ioDirectory: 'rust/target/release/',
+        ioDirectory: '../rust/target/release/',
         webPrefix: 'pkg/',
         wasmBindgenName: 'wasm_bindgen',
       );
@@ -114,8 +117,6 @@ abstract class RustLibApi extends BaseApi {
     required String path,
     IconSize? size,
   });
-
-  String crateApiSimpleGreet({required String name});
 
   Future<void> crateApiSimpleInitApp();
 
@@ -279,8 +280,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateApiDiskDiskInfoKindConstMeta =>
-      const TaskConstMeta(debugName: "DiskInfo_kind", argNames: ["that"]);
+  TaskConstMeta get kCrateApiDiskDiskInfoKindConstMeta => const TaskConstMeta(
+    debugName: "DiskInfo_kind",
+    argNames: ["that"],
+  );
 
   @override
   String crateApiDiskDiskInfoMountPoint({required DiskInfo that}) {
@@ -334,8 +337,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateApiDiskDiskInfoNameConstMeta =>
-      const TaskConstMeta(debugName: "DiskInfo_name", argNames: ["that"]);
+  TaskConstMeta get kCrateApiDiskDiskInfoNameConstMeta => const TaskConstMeta(
+    debugName: "DiskInfo_name",
+    argNames: ["that"],
+  );
 
   @override
   bool crateApiDiskDiskInfoRefresh({required DiskInfo that}) {
@@ -361,7 +366,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiDiskDiskInfoRefreshConstMeta =>
-      const TaskConstMeta(debugName: "DiskInfo_refresh", argNames: ["that"]);
+      const TaskConstMeta(
+        debugName: "DiskInfo_refresh",
+        argNames: ["that"],
+      );
 
   @override
   bool crateApiDiskDiskInfoRefreshSpecifics({
@@ -448,8 +456,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateApiDiskDiskInfoUsageConstMeta =>
-      const TaskConstMeta(debugName: "DiskInfo_usage", argNames: ["that"]);
+  TaskConstMeta get kCrateApiDiskDiskInfoUsageConstMeta => const TaskConstMeta(
+    debugName: "DiskInfo_usage",
+    argNames: ["that"],
+  );
 
   @override
   Future<DiskRefreshKind> crateApiDiskDiskRefreshKindEverything() {
@@ -506,8 +516,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateApiDiskDisksConstMeta =>
-      const TaskConstMeta(debugName: "disks", argNames: []);
+  TaskConstMeta get kCrateApiDiskDisksConstMeta => const TaskConstMeta(
+    debugName: "disks",
+    argNames: [],
+  );
 
   @override
   Future<IconData?> crateApiFileIconGetIconRgba({
@@ -545,29 +557,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  String crateApiSimpleGreet({required String name}) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          sse_encode_String(name, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 15)!;
-        },
-        codec: SseCodec(
-          decodeSuccessData: sse_decode_String,
-          decodeErrorData: null,
-        ),
-        constMeta: kCrateApiSimpleGreetConstMeta,
-        argValues: [name],
-        apiImpl: this,
-      ),
-    );
-  }
-
-  TaskConstMeta get kCrateApiSimpleGreetConstMeta =>
-      const TaskConstMeta(debugName: "greet", argNames: ["name"]);
-
-  @override
   Future<void> crateApiSimpleInitApp() {
     return handler.executeNormal(
       NormalTask(
@@ -576,7 +565,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 16,
+            funcId: 15,
             port: port_,
           );
         },
@@ -591,8 +580,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateApiSimpleInitAppConstMeta =>
-      const TaskConstMeta(debugName: "init_app", argNames: []);
+  TaskConstMeta get kCrateApiSimpleInitAppConstMeta => const TaskConstMeta(
+    debugName: "init_app",
+    argNames: [],
+  );
 
   @override
   Future<void> crateApiOpenerOpenPath({required String path}) {
@@ -604,7 +595,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 17,
+            funcId: 16,
             port: port_,
           );
         },
@@ -619,8 +610,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateApiOpenerOpenPathConstMeta =>
-      const TaskConstMeta(debugName: "open_path", argNames: ["path"]);
+  TaskConstMeta get kCrateApiOpenerOpenPathConstMeta => const TaskConstMeta(
+    debugName: "open_path",
+    argNames: ["path"],
+  );
 
   @override
   Future<void> crateApiOpenerOpenUrl({required String url}) {
@@ -632,7 +625,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 18,
+            funcId: 17,
             port: port_,
           );
         },
@@ -647,8 +640,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateApiOpenerOpenUrlConstMeta =>
-      const TaskConstMeta(debugName: "open_url", argNames: ["url"]);
+  TaskConstMeta get kCrateApiOpenerOpenUrlConstMeta => const TaskConstMeta(
+    debugName: "open_url",
+    argNames: ["url"],
+  );
 
   RustArcIncrementStrongCountFnType
   get rust_arc_increment_strong_count_DiskInfo => wire
@@ -733,7 +728,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       case 1:
         return DiskKind_SSD();
       case 2:
-        return DiskKind_Unknown(dco_decode_isize(raw[1]));
+        return DiskKind_Unknown(
+          dco_decode_isize(raw[1]),
+        );
       default:
         throw Exception("unreachable");
     }
@@ -1339,7 +1336,9 @@ class DiskInfoImpl extends RustOpaque implements DiskInfo {
   /// }
   /// ```
   BigInt availableSpace() =>
-      RustLib.instance.api.crateApiDiskDiskInfoAvailableSpace(that: this);
+      RustLib.instance.api.crateApiDiskDiskInfoAvailableSpace(
+        that: this,
+      );
 
   /// Returns the file system used on this disk (so for example: `EXT4`, `NTFS`, etc...).
   ///
@@ -1351,8 +1350,9 @@ class DiskInfoImpl extends RustOpaque implements DiskInfo {
   ///     println!("[{:?}] {:?}", disk.name(), disk.file_system());
   /// }
   /// ```
-  String fileSystem() =>
-      RustLib.instance.api.crateApiDiskDiskInfoFileSystem(that: this);
+  String fileSystem() => RustLib.instance.api.crateApiDiskDiskInfoFileSystem(
+    that: this,
+  );
 
   /// Returns `true` if the disk is read-only.
   ///
@@ -1364,8 +1364,9 @@ class DiskInfoImpl extends RustOpaque implements DiskInfo {
   ///     println!("[{:?}] is read-only: {}", disk.name(), disk.is_read_only());
   /// }
   /// ```
-  bool isReadOnly() =>
-      RustLib.instance.api.crateApiDiskDiskInfoIsReadOnly(that: this);
+  bool isReadOnly() => RustLib.instance.api.crateApiDiskDiskInfoIsReadOnly(
+    that: this,
+  );
 
   /// Returns `true` if the disk is removable.
   ///
@@ -1377,8 +1378,9 @@ class DiskInfoImpl extends RustOpaque implements DiskInfo {
   ///     println!("[{:?}] {}", disk.name(), disk.is_removable());
   /// }
   /// ```
-  bool isRemovable() =>
-      RustLib.instance.api.crateApiDiskDiskInfoIsRemovable(that: this);
+  bool isRemovable() => RustLib.instance.api.crateApiDiskDiskInfoIsRemovable(
+    that: this,
+  );
 
   /// Returns the kind of disk.
   ///
@@ -1390,7 +1392,9 @@ class DiskInfoImpl extends RustOpaque implements DiskInfo {
   ///     println!("[{:?}] {:?}", disk.name(), disk.kind());
   /// }
   /// ```
-  DiskKind kind() => RustLib.instance.api.crateApiDiskDiskInfoKind(that: this);
+  DiskKind kind() => RustLib.instance.api.crateApiDiskDiskInfoKind(
+    that: this,
+  );
 
   /// Returns the mount point of the disk (`/` for example).
   ///
@@ -1402,8 +1406,9 @@ class DiskInfoImpl extends RustOpaque implements DiskInfo {
   ///     println!("[{:?}] {:?}", disk.name(), disk.mount_point());
   /// }
   /// ```
-  String mountPoint() =>
-      RustLib.instance.api.crateApiDiskDiskInfoMountPoint(that: this);
+  String mountPoint() => RustLib.instance.api.crateApiDiskDiskInfoMountPoint(
+    that: this,
+  );
 
   /// Returns the disk name.
   ///
@@ -1415,7 +1420,9 @@ class DiskInfoImpl extends RustOpaque implements DiskInfo {
   ///     println!("{:?}", disk.name());
   /// }
   /// ```
-  String name() => RustLib.instance.api.crateApiDiskDiskInfoName(that: this);
+  String name() => RustLib.instance.api.crateApiDiskDiskInfoName(
+    that: this,
+  );
 
   /// Updates the disk' information with everything loaded.
   ///
@@ -1429,8 +1436,9 @@ class DiskInfoImpl extends RustOpaque implements DiskInfo {
   ///     disk.refresh();
   /// }
   /// ```
-  bool refresh() =>
-      RustLib.instance.api.crateApiDiskDiskInfoRefresh(that: this);
+  bool refresh() => RustLib.instance.api.crateApiDiskDiskInfoRefresh(
+    that: this,
+  );
 
   /// Updates the disk's information corresponding to the given [`DiskRefreshKind`].
   ///
@@ -1457,8 +1465,9 @@ class DiskInfoImpl extends RustOpaque implements DiskInfo {
   ///     println!("[{:?}] {}B", disk.name(), disk.total_space());
   /// }
   /// ```
-  BigInt totalSpace() =>
-      RustLib.instance.api.crateApiDiskDiskInfoTotalSpace(that: this);
+  BigInt totalSpace() => RustLib.instance.api.crateApiDiskDiskInfoTotalSpace(
+    that: this,
+  );
 
   /// Returns number of bytes read and written by the disk
   ///
@@ -1470,6 +1479,7 @@ class DiskInfoImpl extends RustOpaque implements DiskInfo {
   ///     println!("[{:?}] disk usage: {:?}", disk.name(), disk.usage());
   /// }
   /// ```
-  DiskUsage usage() =>
-      RustLib.instance.api.crateApiDiskDiskInfoUsage(that: this);
+  DiskUsage usage() => RustLib.instance.api.crateApiDiskDiskInfoUsage(
+    that: this,
+  );
 }

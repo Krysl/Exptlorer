@@ -4,7 +4,6 @@ use std::os::windows::ffi::OsStrExt;
 use std::sync::Mutex;
 use windows_sys::core::PCWSTR;
 
-// SHGetFileInfoW 和 GDI 操作不是线程安全的，全局锁串行化
 static ICON_LOCK: Mutex<()> = Mutex::new(());
 use windows_sys::Win32::Graphics::Gdi::{
     CreateCompatibleDC, DeleteDC, DeleteObject, GetDIBits, GetObjectW, SelectObject, BITMAP,
@@ -35,7 +34,6 @@ fn get_file_icon_rgba_full(path: String, size: IconSize) -> Option<IconData> {
         .encode_wide()
         .chain(std::iter::once(0))
         .collect();
-    // 全局锁：SHGetFileInfoW 和 GDI 非线程安全
     let _lock = ICON_LOCK.lock().ok()?;
     unsafe {
         let mut info: SHFILEINFOW = mem::zeroed();
@@ -44,7 +42,6 @@ fn get_file_icon_rgba_full(path: String, size: IconSize) -> Option<IconData> {
             IconSize::Small => SHGFI_SMALLICON,
         };
 
-        // 直接访问真实路径，不设 USEFILEATTRIBUTES，驱动器才能返回正确图标
         let ret = SHGetFileInfoW(
             wide.as_ptr() as PCWSTR,
             0,

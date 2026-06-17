@@ -1,6 +1,7 @@
-import 'package:exptlorer/src/utils/num.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+
+import '../../utils/num.dart';
 
 mixin Selectable<T extends Widget> on StatefulWidget {
   abstract final bool isSelected;
@@ -13,8 +14,7 @@ mixin MultiSelectable<T extends Selectable> on StatefulWidget {
   abstract final void Function(String? path)? onTapWithoutModifierKeys;
 }
 
-mixin MultiSelect<I extends Selectable, T extends MultiSelectable<I>>
-    on State<T> {
+mixin MultiSelect<I extends Selectable, T extends MultiSelectable<I>> on State<T> {
   List<bool> selected = [];
   int lastSelected = 0;
 
@@ -24,12 +24,12 @@ mixin MultiSelect<I extends Selectable, T extends MultiSelectable<I>>
     }
   }
 
-  void select(
-    int index,
+  void select({
+    required int index,
     String? path,
-    bool isDir,
-    void Function(String? path)? onTapWithoutModifierKeys,
-  ) {
+    required bool isDir,
+    required void Function(String? path)? onTapWithoutModifierKeys,
+  }) {
     final instance = HardwareKeyboard.instance;
     if (instance.isControlPressed) {
       selected[index] = !selected[index];
@@ -49,11 +49,11 @@ mixin MultiSelect<I extends Selectable, T extends MultiSelectable<I>>
   bool isSelected(int index) => selected[index];
   Widget multiSelectBuilder({
     required int itemCount,
-    required Widget Function(
-      int index,
-      bool isSelected,
+    required Widget Function({
+      required int index,
+      required bool isSelected,
       GestureTapDownCallback? onTapDown,
-    )
+    })
     itemBuilder,
     required String Function(int index) path,
     required bool Function(int index) isDir,
@@ -67,15 +67,15 @@ mixin MultiSelect<I extends Selectable, T extends MultiSelectable<I>>
         itemCount: itemCount,
         itemBuilder: (ctx, index) {
           return itemBuilder(
-            index, //
-            isSelected(index),
-            (details) {
+            index: index, //
+            isSelected: isSelected(index),
+            onTapDown: (details) {
               setState(() {
                 select(
-                  index,
-                  path(index),
-                  isDir(index),
-                  widget.onTapWithoutModifierKeys,
+                  index: index,
+                  path: path(index),
+                  isDir: isDir(index),
+                  onTapWithoutModifierKeys: widget.onTapWithoutModifierKeys,
                 );
               });
             },

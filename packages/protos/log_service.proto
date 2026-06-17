@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package logui;
+
+/// gRPC log forwarding service.
+///
+/// exptlorer sends Talker log entries to log_ui via this service.
+service LogService {
+  /// Send one log entry.
+  rpc SendLog(LogEntry) returns (Empty);
+}
+
+/// Log level enum, aligned with talker [LogLevel].
+enum Level {
+  LEVEL_UNSPECIFIED = 0;
+  LEVEL_DEBUG = 1;
+  LEVEL_INFO = 2;
+  LEVEL_WARNING = 3;
+  LEVEL_ERROR = 4;
+  LEVEL_CRITICAL = 5;
+  LEVEL_VERBOSE = 6;
+}
+
+/// A single log entry.
+message LogEntry {
+  /// Log level.
+  Level level = 1;
+
+  /// Log title (e.g. "gRPC request", "TalkerLog").
+  string title = 2;
+
+  /// Log message body.
+  string message = 3;
+
+  /// ISO-8601 timestamp (maps to TalkerData.time).
+  int64 time = 4;
+}
+
+/// Empty response.
+message Empty {}

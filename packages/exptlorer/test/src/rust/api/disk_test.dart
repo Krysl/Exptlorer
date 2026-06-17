@@ -17,6 +17,6 @@ void main() {
       debugPrint('kind:${d.kind()},mount:${d.mountPoint()}, name:${d.name()}');
     }
     expect(ds.length, greaterThan(1));
-    expect(d[ds.first], r"C:\");
+    expect(d[ds.first], r'C:\');
   });
 }

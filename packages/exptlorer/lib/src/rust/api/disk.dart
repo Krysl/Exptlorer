@@ -155,7 +155,9 @@ sealed class DiskKind with _$DiskKind {
 
   const factory DiskKind.hdd() = DiskKind_HDD;
   const factory DiskKind.ssd() = DiskKind_SSD;
-  const factory DiskKind.unknown(PlatformInt64 field0) = DiskKind_Unknown;
+  const factory DiskKind.unknown(
+    PlatformInt64 field0,
+  ) = DiskKind_Unknown;
 }
 
 /// Used to determine what you want to refresh specifically on the [`Disk`] type.

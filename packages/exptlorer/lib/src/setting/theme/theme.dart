@@ -54,10 +54,11 @@ class AppTheme extends _$AppTheme {
     state = callback(state);
   }
 
+  //
   // ignore: riverpod_lint/avoid_build_context_in_providers
-  void setEffect(final WindowEffect effect, final BuildContext context) {
+  Future<void> setEffect(WindowEffect effect, BuildContext context) async {
     final theme = FluentTheme.of(context);
-    Window.setEffect(
+    await Window.setEffect(
       effect: effect,
       color: [WindowEffect.solid, WindowEffect.acrylic].contains(effect)
           ? theme.micaBackgroundColor.withValues(alpha: 0.05)
@@ -66,15 +67,15 @@ class AppTheme extends _$AppTheme {
     );
   }
 
+  //
   // ignore: riverpod_lint/avoid_build_context_in_providers
-  FluentThemeData getTheme(bool isDark, final BuildContext context) =>
-      FluentThemeData(
-        brightness: isDark ? .dark : .light,
-        accentColor: state.color,
-        visualDensity: state.visualDensity,
-        focusTheme: FocusThemeData(
-          glowFactor: is10footScreen(context) ? 2.0 : 0.0,
-        ),
-        fontFamily: kIsWeb ? 'Segoe UI' : null,
-      );
+  FluentThemeData getTheme(BuildContext context, {required bool isDark}) => FluentThemeData(
+    brightness: isDark ? .dark : .light,
+    accentColor: state.color,
+    visualDensity: state.visualDensity,
+    focusTheme: FocusThemeData(
+      glowFactor: is10footScreen(context) ? 2.0 : 0.0,
+    ),
+    fontFamily: kIsWeb ? 'Segoe UI' : null,
+  );
 }

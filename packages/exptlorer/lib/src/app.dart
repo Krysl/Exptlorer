@@ -1,10 +1,11 @@
-import 'package:exptlorer/src/actions/open.dart';
-import 'package:exptlorer/src/setting/theme/theme.dart';
-import 'package:exptlorer/src/window.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_acrylic/flutter_acrylic.dart' as flutter_acrylic;
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+import 'actions/open.dart';
+import 'setting/theme/theme.dart';
+import 'window.dart';
 
 const String appTitle = 'Expᵗlorer';
 
@@ -21,17 +22,15 @@ class MyApp extends ConsumerWidget {
       themeMode: appThemeData.mode,
       debugShowCheckedModeBanner: false,
       color: appThemeData.color,
-      darkTheme: appTheme.getTheme(true, context),
-      theme: appTheme.getTheme(false, context),
+      darkTheme: appTheme.getTheme(isDark: true, context),
+      theme: appTheme.getTheme(isDark: false, context),
       locale: appThemeData.locale,
-      builder: (final context, final child) {
+      builder: (context, child) {
         final widget = Directionality(
           textDirection: appThemeData.textDirection,
           child: NavigationPaneTheme(
             data: NavigationPaneThemeData(
-              backgroundColor:
-                  appThemeData.windowEffect !=
-                      flutter_acrylic.WindowEffect.disabled
+              backgroundColor: appThemeData.windowEffect != flutter_acrylic.WindowEffect.disabled
                   ? Colors.transparent
                   : null,
             ),

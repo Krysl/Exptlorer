@@ -1,12 +1,13 @@
 import 'dart:io';
 
-import 'package:exptlorer/src/model/drives.dart';
-import 'package:exptlorer/src/model/file_icon.dart';
-import 'package:exptlorer/src/utils/num.dart';
-import 'package:exptlorer/src/widgets/multi_select_list.dart';
-import 'package:exptlorer/src/widgets/miller_columns.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+import '../model/drives.dart';
+import '../model/file_icon.dart';
+import '../utils/num.dart';
+import 'miller_columns.dart';
+import 'multi_select_list.dart';
 
 class DriveItem extends ConsumerStatefulWidget {
   const DriveItem({
@@ -33,9 +34,7 @@ class _DriveItemState extends ConsumerState<DriveItem> {
     final img = ref.watch(fileIconProvider(widget.drive.mountPoint));
     final isDark = FluentTheme.of(context).brightness == .dark;
     return Card(
-      backgroundColor: (widget.isHovered || widget.isSelected)
-          ? (isDark ? Colors.grey[130] : Colors.grey[30])
-          : null,
+      backgroundColor: (widget.isHovered || widget.isSelected) ? (isDark ? Colors.grey[130] : Colors.grey[30]) : null,
       child: Tooltip(
         message: widget.drive.toString(),
         child: widget.width > widget.size.smallWidth
@@ -80,20 +79,19 @@ class _DriveItemState extends ConsumerState<DriveItem> {
       child: img.when(
         data: (data) => RawImage(image: data),
         error: (error, st) => Tooltip(message: '$error, $st'),
-        loading: () => ProgressRing(),
+        loading: ProgressRing.new,
       ),
     );
   }
 
   List<Widget> buildLable() {
     final driveName = widget.drive.mountPoint.split(r'\').first;
-    final gb =
-        '${widget.drive.availableSpace.inGB.fixed1} / ${widget.drive.totalSpace.inGB.toInt()} GB';
+    final gb = '${widget.drive.availableSpace.inGB.fixed1} / ${widget.drive.totalSpace.inGB.toInt()} GB';
     return widget.size.whens(
       widget.width, //
       [Text(driveName)],
       [Text(driveName)],
-      [Text('${widget.drive.name} ($driveName)'), Spacer(), Text(gb)],
+      [Text('${widget.drive.name} ($driveName)'), const Spacer(), Text(gb)],
     );
   }
 }
@@ -117,12 +115,12 @@ class DriveList extends StatefulWidget {
 class _DriveListState extends State<DriveList> {
   @override
   Widget build(BuildContext context) {
-    var drives = widget.drives.drives;
+    final drives = widget.drives.drives;
     return LayoutBuilder(
       builder: (context, constraints) {
         return MultiSelectList(
           itemCount: drives.length,
-          itemBuilder: (index, isSelected, isHovered) {
+          itemBuilder: ({required index, required isSelected, required isHovered}) {
             final drive = drives[index];
             return DriveItem(
               drive: drive,

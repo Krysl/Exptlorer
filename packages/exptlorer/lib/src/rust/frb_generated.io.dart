@@ -6,7 +6,6 @@
 import 'api/disk.dart';
 import 'api/file_icon.dart';
 import 'api/opener.dart';
-import 'api/simple.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:ffi' as ffi;

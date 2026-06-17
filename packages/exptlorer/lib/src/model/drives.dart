@@ -1,10 +1,11 @@
-import 'package:exptlorer/src/rust/api/disk.dart';
-import 'package:exptlorer/src/utils/num.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'drives.g.dart';
+import '../rust/api/disk.dart';
+import '../utils/num.dart';
+
 part 'drives.freezed.dart';
+part 'drives.g.dart';
 
 enum DriveKind {
   hdd,
@@ -39,8 +40,8 @@ abstract class Drive with _$Drive {
     name: info.name(),
     fileSystem: info.fileSystem(),
     mountPoint: info.mountPoint(),
-    totalSpace: (info.totalSpace()).toIntSafe(),
-    availableSpace: (info.availableSpace()).toIntSafe(),
+    totalSpace: info.totalSpace().toIntSafe(),
+    availableSpace: info.availableSpace().toIntSafe(),
     isRemovable: info.isRemovable(),
     isReadOnly: info.isReadOnly(),
     usage: info.usage(),
@@ -59,16 +60,16 @@ extension on List<Drive> {
 }
 
 class Drives {
-  List<Drive> drives;
   Drives(this.drives);
 
   Drives.fromDiskInfo(List<DiskInfo> infos)
     : this(
         infos //
-            .map((d) => Drive.fromDiskInfo(d))
+            .map(Drive.fromDiskInfo)
             .toList()
           ..sortByMountPoint(),
       );
+  List<Drive> drives;
 }
 
 @riverpod

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:fluent_ui/fluent_ui.dart';
 
 /// Scrollbar with hover-aware thickness animation and thumb highlighting.
@@ -23,8 +25,7 @@ class HoverScrollbar extends StatefulWidget {
   State<HoverScrollbar> createState() => HoverScrollbarState();
 }
 
-class HoverScrollbarState extends State<HoverScrollbar>
-    with SingleTickerProviderStateMixin {
+class HoverScrollbarState extends State<HoverScrollbar> with SingleTickerProviderStateMixin {
   late AnimationController _animCtrl;
   late Animation<double> _thicknessAnim;
   bool _listHovered = false;
@@ -53,9 +54,7 @@ class HoverScrollbarState extends State<HoverScrollbar>
 
   @override
   Widget build(BuildContext context) {
-    final thickness =
-        widget.thinThickness +
-        (widget.thickThickness - widget.thinThickness) * _thicknessAnim.value;
+    final thickness = widget.thinThickness + (widget.thickThickness - widget.thinThickness) * _thicknessAnim.value;
 
     const double hoverMargin = 20;
     final isDark = FluentTheme.of(context).brightness == .dark;
@@ -69,7 +68,7 @@ class HoverScrollbarState extends State<HoverScrollbar>
             _listHovered = false;
             if (_nearEdge) {
               _nearEdge = false;
-              _animCtrl.reverse();
+              unawaited(_animCtrl.reverse());
             }
             setState(() {});
           },
@@ -79,9 +78,9 @@ class HoverScrollbarState extends State<HoverScrollbar>
             if (near != _nearEdge) {
               _nearEdge = near;
               if (near) {
-                _animCtrl.forward();
+                unawaited(_animCtrl.forward());
               } else {
-                _animCtrl.reverse();
+                unawaited(_animCtrl.reverse());
               }
             }
             _overThumb = x >= width - widget.thickThickness * 1.5;

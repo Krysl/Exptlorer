@@ -1,10 +1,12 @@
-import 'package:exptlorer/src/setting/theme/theme.dart';
-import 'package:exptlorer/src/view/home.dart';
-import 'package:exptlorer/src/window.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/foundation.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:window_manager/window_manager.dart';
+
+import 'setting/theme/theme.dart';
+import 'view/home.dart';
+import 'view/log_settings_page.dart';
+import 'window.dart';
 
 class Navigation extends ConsumerStatefulWidget {
   const Navigation({super.key, required this.appTitle});
@@ -15,8 +17,7 @@ class Navigation extends ConsumerStatefulWidget {
 }
 
 class _NavigationState extends ConsumerState<Navigation> {
-  final viewKey = GlobalKey(debugLabel: 'Navigation View Key');
-  final searchKey = GlobalKey(debugLabel: 'Search Bar Key');
+  final viewKey = GlobalKey<NavigationViewState>(debugLabel: 'Navigation View Key');
   final searchFocusNode = FocusNode();
   final searchController = TextEditingController();
 
@@ -48,11 +49,7 @@ class _NavigationState extends ConsumerState<Navigation> {
               builder: (context) {
                 final allItems = NavigationView.dataOf(context).pane!.allItems
                     .where(
-                      (i) =>
-                          i is PaneItem &&
-                          i is! PaneItemExpander &&
-                          i.body != null &&
-                          i.enabled,
+                      (i) => i is PaneItem && i is! PaneItemExpander && i.body != null && i.enabled,
                     )
                     .cast<PaneItem>();
                 return AutoSuggestBox<PaneItem>(
@@ -75,7 +72,7 @@ class _NavigationState extends ConsumerState<Navigation> {
           message: 'Toggle theme',
           child: ToggleButton(
             checked: theme.brightness == Brightness.dark,
-            onChanged: (final v) {
+            onChanged: (v) {
               appTheme.update((data) {
                 return data.copyWith(mode: v ? .dark : .light);
               });
@@ -89,9 +86,9 @@ class _NavigationState extends ConsumerState<Navigation> {
             ? () async {
                 final isMaximized = await windowManager.isMaximized();
                 if (isMaximized) {
-                  windowManager.restore();
+                  await windowManager.restore();
                 } else {
-                  windowManager.maximize();
+                  await windowManager.maximize();
                 }
               }
             : null,
@@ -105,7 +102,7 @@ class _NavigationState extends ConsumerState<Navigation> {
         header: SizedBox(
           height: kOneLineTileHeight,
           child: ShaderMask(
-            shaderCallback: (final rect) {
+            shaderCallback: (rect) {
               final color = appThemeData.color.defaultBrushFor(
                 theme.brightness,
               );
@@ -137,7 +134,11 @@ class _NavigationState extends ConsumerState<Navigation> {
           ),
         ],
         footerItems: [
-          //
+          PaneItem(
+            icon: const Icon(FluentIcons.settings),
+            title: const Text('日志设置'),
+            body: const LogSettingsPage(),
+          ),
         ],
       ),
       onOpenSearch: searchFocusNode.requestFocus,

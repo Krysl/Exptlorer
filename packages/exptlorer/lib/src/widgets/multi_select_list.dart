@@ -2,10 +2,10 @@ import 'dart:io';
 
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/services.dart';
-import 'package:exptlorer/src/utils/num.dart';
 
-import 'hover_scrollbar.dart';
 import '../actions/actions.dart';
+import '../utils/num.dart';
+import 'hover_scrollbar.dart';
 
 /// Holds multi-selection state and notifies listeners on change.
 class MultiSelectController extends ChangeNotifier {
@@ -18,7 +18,7 @@ class MultiSelectController extends ChangeNotifier {
   bool isSelected(int index) => _selected[index];
 
   Iterable<int> get selectedIndices sync* {
-    for (int i = 0; i < _selected.length; i++) {
+    for (var i = 0; i < _selected.length; i++) {
       if (_selected[i]) yield i;
     }
   }
@@ -34,11 +34,13 @@ class MultiSelectController extends ChangeNotifier {
     }
   }
 
+  // ignore: avoid_positional_boolean_parameters
   void setSelected(int index, bool value) {
     _selected[index] = value;
     notifyListeners();
   }
 
+  // ignore: avoid_positional_boolean_parameters
   void fillRange(int start, int end, bool value) {
     _selected.fillRange(start, end, value);
     notifyListeners();
@@ -74,7 +76,7 @@ class MultiSelectList extends StatefulWidget {
   });
 
   final int itemCount;
-  final Widget Function(int index, bool isSelected, bool isHovered) itemBuilder;
+  final Widget Function({required int index, required bool isSelected, required bool isHovered}) itemBuilder;
   final FileSystemEntity Function(int index) path;
   final bool Function(int index) isDir;
   final void Function(FileSystemEntity? path)? onTapWithoutModifierKeys;
@@ -95,7 +97,7 @@ class _MultiSelectListState extends State<MultiSelectList> {
   final _focusNode = FocusNode();
   int? _hoveredIndex;
   final List<GlobalKey> _itemKeys = [];
-  final _paintKey = GlobalKey();
+  final _paintKey = GlobalKey<State>();
   final ScrollController _scrollController = ScrollController();
   final ValueNotifier<int> _repaintNotifier = ValueNotifier(0);
 
@@ -142,16 +144,19 @@ class _MultiSelectListState extends State<MultiSelectList> {
     final ctrl = _effectiveCtrl;
     final instance = HardwareKeyboard.instance;
     if (instance.isControlPressed) {
-      ctrl.setSelected(index, !ctrl.isSelected(index));
-      ctrl.setLastSelected(index);
+      ctrl
+        ..setSelected(index, !ctrl.isSelected(index))
+        ..setLastSelected(index);
     } else if (instance.isShiftPressed) {
-      ctrl.clear();
       final (start, end) = sort2(ctrl.lastSelected, index);
-      ctrl.fillRange(start, end + 1, true);
+      ctrl
+        ..clear()
+        ..fillRange(start, end + 1, true);
     } else {
-      ctrl.clear();
-      ctrl.setSelected(index, true);
-      ctrl.setLastSelected(index);
+      ctrl
+        ..clear()
+        ..setSelected(index, true)
+        ..setLastSelected(index);
       widget.onTapWithoutModifierKeys?.call(
         widget.isDir(index) ? widget.path(index) : null,
       );
@@ -193,9 +198,9 @@ class _MultiSelectListState extends State<MultiSelectList> {
                       bottom: widget.strokeWidth / 2,
                     ),
                     child: widget.itemBuilder(
-                      index,
-                      isSel,
-                      _hoveredIndex == index,
+                      index: index,
+                      isSelected: isSel,
+                      isHovered: _hoveredIndex == index,
                     ),
                   ),
                 ),
@@ -272,8 +277,7 @@ class _GuideOverlayPainter extends CustomPainter {
     if (ctx != null) {
       final box = ctx.findRenderObject() as RenderBox?;
       if (box != null && box.hasSize) {
-        sourceRect =
-            box.localToGlobal(Offset.zero, ancestor: paintBox) & box.size;
+        sourceRect = box.localToGlobal(Offset.zero, ancestor: paintBox) & box.size;
       }
     }
 

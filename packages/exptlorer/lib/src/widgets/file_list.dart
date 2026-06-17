@@ -1,10 +1,11 @@
 import 'dart:io';
 
-import 'package:exptlorer/src/model/file_icon.dart';
-import 'package:exptlorer/src/widgets/multi_select_list.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:path/path.dart' as path;
+
+import '../model/file_icon.dart';
+import 'multi_select_list.dart';
 
 class FileItem extends ConsumerStatefulWidget {
   const FileItem({
@@ -38,7 +39,7 @@ class _FileItemState extends ConsumerState<FileItem> {
             child: img.when(
               data: (data) => RawImage(image: data),
               error: (error, st) => Tooltip(message: '$error, $st'),
-              loading: () => ProgressRing(),
+              loading: ProgressRing.new,
             ),
           ),
           Expanded(
@@ -72,8 +73,8 @@ class _FileListState extends State<FileList> {
     final fileList = widget.dir.listSync();
     return MultiSelectList(
       itemCount: fileList.length,
-      itemBuilder: (index, isSelected, isHovered) {
-        var entity = fileList[index];
+      itemBuilder: ({required index, required isSelected, required isHovered}) {
+        final entity = fileList[index];
         return FileItem(
           entity: entity.absolute,
           isSelected: isSelected,

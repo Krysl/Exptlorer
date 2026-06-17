@@ -2,9 +2,10 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:ui' as ui;
 
-import 'package:exptlorer/src/rust/api/file_icon.dart';
 import 'package:flutter/widgets.dart' hide IconData;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+import '../rust/api/file_icon.dart';
 
 part 'file_icon.g.dart';
 
@@ -24,14 +25,14 @@ class FileIcon extends _$FileIcon {
 
     if (icon == null) return null;
 
-    final Completer<ui.Image> completer = Completer();
+    final completer = Completer<ui.Image>();
 
     ui.decodeImageFromPixels(
       icon.bgraBytes,
       icon.width,
       icon.height,
       .bgra8888,
-      (ima) => completer.complete(ima),
+      completer.complete,
     );
     return await completer.future;
   }

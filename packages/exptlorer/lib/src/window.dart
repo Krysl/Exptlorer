@@ -1,8 +1,9 @@
-import 'package:exptlorer/src/app.dart';
-import 'package:exptlorer/src/navigation.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/foundation.dart';
 import 'package:window_manager/window_manager.dart';
+
+import 'app.dart';
+import 'navigation.dart';
 
 class Window extends StatefulWidget {
   const Window({super.key, required this.appTitle});
@@ -27,13 +28,13 @@ class _MyHomePageState extends State<Window> with WindowListener {
   }
 
   @override
-  Widget build(final BuildContext context) => Navigation(appTitle: appTitle);
+  Widget build(BuildContext context) => const Navigation(appTitle: appTitle);
 
   @override
   Future<void> onWindowClose() async {
     final isPreventClose = await windowManager.isPreventClose();
     if (isPreventClose && mounted) {
-      showDialog(
+      await showDialog(
         context: context,
         builder: (_) {
           return ContentDialog(
@@ -42,9 +43,9 @@ class _MyHomePageState extends State<Window> with WindowListener {
             actions: [
               FilledButton(
                 child: const Text('Yes'),
-                onPressed: () {
+                onPressed: () async {
                   Navigator.pop(context);
-                  windowManager.destroy();
+                  await windowManager.destroy();
                 },
               ),
               Button(
@@ -65,7 +66,7 @@ class WindowButtons extends StatelessWidget {
   const WindowButtons({super.key});
 
   @override
-  Widget build(final BuildContext context) {
+  Widget build(BuildContext context) {
     final theme = FluentTheme.of(context);
 
     switch (defaultTargetPlatform) {
@@ -80,6 +81,8 @@ class WindowButtons extends StatelessWidget {
             backgroundColor: Colors.transparent,
           ),
         );
+      //
+      // ignore: no_default_cases
       default:
         return const SizedBox.shrink();
     }
