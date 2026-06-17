@@ -1,64 +1,84 @@
 import 'package:args/args.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:talker/talker.dart';
 
 import 'log.dart';
 
-/// Parse [LogLevel] from CLI string argument.
-LogLevel? logLevelFromString(String? s) => logLevelNameMap[s];
+part 'cli_args.freezed.dart';
 
-String logLevelToString(LogLevel level) => level.name;
+const hostDefault = '127.0.0.1';
+const portDefault = 50051;
+final portDefaultStr = portDefault.toString();
 
 /// Parsed command-line arguments.
-class CliConfig {
-  const CliConfig({
-    this.enableTalker = false,
-    this.grpcHost,
-    this.grpcPort,
-    this.logLevel = LogLevel.info,
-  });
+@freezed
+abstract class CliConfig with _$CliConfig {
+  const factory CliConfig({
+    /// Enable Talker logging framework.
+    @Default(false) bool enableTalker,
 
-  /// Enable Talker logging framework.
-  final bool enableTalker;
+    /// gRPC log server host; null disables gRPC push.
+    @Default(hostDefault) String grpcHost,
 
-  /// gRPC log server host; null disables gRPC push.
-  final String? grpcHost;
+    /// gRPC log server port.
+    @Default(portDefault) int grpcPort,
 
-  /// gRPC log server port.
-  final int? grpcPort;
+    /// Log level
+    @Default(LogLevel.info) LogLevel logLevel,
 
-  /// Log level
-  final LogLevel logLevel;
+    /// auto connect at startup
+    @Default(false) bool autoConnect,
 
-  bool get enableGrpc => grpcHost != null && grpcPort != null;
+    /// show console output when connected
+    @Default(false) bool showConsoleOutput,
+  }) = _CliConfig;
+}
 
-  @override
-  String toString() =>
-      'CliConfig(enableTalker: $enableTalker, grpcHost: $grpcHost, '
-      'grpcPort: $grpcPort, logLevel: $logLevel)';
+class _CmdArgs {
+  static const talker = 'talker';
+  static const talkerGprcHost = 'talker-grpc-host';
+  static const talkerGprcPort = 'talker-grpc-port';
+  static const talkerGprcAutoConnect = 'talker-grpc-auto-connect';
+  static const talkerGprcShowConsoleOutput = 'talker-grpc--hide-console-output';
+  static const logLevel = 'log-level';
 }
 
 final _parser = ArgParser()
   ..addFlag(
-    'talker',
+    _CmdArgs.talker,
     abbr: 't',
     help: 'Enable Talker logging',
   )
   ..addOption(
-    'talker-grpc-host',
+    _CmdArgs.talkerGprcHost,
+    abbr: 'h',
     help: 'gRPC log server host',
     valueHelp: 'HOST',
+    defaultsTo: hostDefault,
   )
   ..addOption(
-    'talker-grpc-port',
+    _CmdArgs.talkerGprcPort,
+    abbr: 'p',
     help: 'gRPC log server port',
     valueHelp: 'PORT',
+    defaultsTo: portDefaultStr,
+  )
+  ..addFlag(
+    _CmdArgs.talkerGprcAutoConnect,
+    abbr: 'a',
+    help: 'gRPC log server auto connect',
+  )
+  ..addFlag(
+    _CmdArgs.talkerGprcShowConsoleOutput,
+    abbr: 's',
+    help: 'show console output when gRPC log server is connected',
   )
   ..addOption(
-    'log-level',
-    defaultsTo: 'info',
-    allowed: ['debug', 'info', 'warning', 'error'],
-    help: 'Log level (debug/info/warning/error)',
+    _CmdArgs.logLevel,
+    defaultsTo: LogLevel.info.name,
+    allowed: logLevelNameMap.keys,
+    help: 'Log level (${logLevelNameMap.keys.join('/')})',
   )
   ..addFlag('help', abbr: 'h', help: 'Show this help');
 
@@ -87,14 +107,18 @@ CliConfig parseCliArgs(List<String> args) {
     printCliHelp();
   }
 
-  final grpcHost = results['talker-grpc-host'] as String?;
-  final grpcPortStr = results['talker-grpc-port'] as String?;
-  final grpcPort = grpcPortStr != null ? int.tryParse(grpcPortStr) : null;
+  final grpcHost = results[_CmdArgs.talkerGprcHost] as String;
+  final grpcPort = int.tryParse(results[_CmdArgs.talkerGprcPort] as String) ?? portDefault;
+  final grpcAutoConnect = results[_CmdArgs.talkerGprcAutoConnect] as bool;
+  final grpcShowConsole = results[_CmdArgs.talkerGprcShowConsoleOutput] as bool;
 
+  final logLevel = results['log-level'] as String;
   return CliConfig(
     enableTalker: results['talker'] as bool,
     grpcHost: grpcHost,
     grpcPort: grpcPort,
-    logLevel: logLevelFromString(results['log-level'] as String?) ?? LogLevel.info,
+    logLevel: logLevelNameMap[logLevel] ?? LogLevel.info,
+    autoConnect: grpcAutoConnect,
+    showConsoleOutput: grpcShowConsole,
   );
 }

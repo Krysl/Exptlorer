@@ -13,12 +13,12 @@ service LogService {
 /// Log level enum, aligned with talker [LogLevel].
 enum Level {
   LEVEL_UNSPECIFIED = 0;
-  LEVEL_DEBUG = 1;
-  LEVEL_INFO = 2;
-  LEVEL_WARNING = 3;
-  LEVEL_ERROR = 4;
-  LEVEL_CRITICAL = 5;
-  LEVEL_VERBOSE = 6;
+  LEVEL_CRITICAL    = 1;
+  LEVEL_ERROR       = 2;
+  LEVEL_WARNING     = 3;
+  LEVEL_INFO        = 4;
+  LEVEL_DEBUG       = 5;
+  LEVEL_VERBOSE     = 6;
 }
 
 /// A single log entry.

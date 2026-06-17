@@ -5,7 +5,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:talker/talker.dart';
 
 import '../setting/log/log_settings.dart';
-import '../utils/cli_args.dart';
 import '../utils/log.dart';
 
 /// Log settings page.
@@ -186,7 +185,7 @@ class _LogSettingsPageState extends ConsumerState<LogSettingsPage> {
                         ])
                           RadioButton<LogLevel>(
                             value: level,
-                            content: Text(logLevelToString(level)),
+                            content: Text(level.name),
                           ),
                       ],
                     ),

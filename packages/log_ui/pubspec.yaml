@@ -38,6 +38,7 @@ dependencies:
 
   talker_flutter: ^5.1.17
   talker_grpc_logger: ^5.1.17
+  window_manager: ^0.5.1
 dev_dependencies:
   flutter_lints: ^6.0.0
   flutter_test:

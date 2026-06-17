@@ -17,7 +17,9 @@
         "-a",
         "--talker-grpc-port=50051",
         "-a",
-        "--log-level=debug"
+        "--log-level=debug",
+        "-a",
+        "--talker-grpc-auto-connect",
       ],
       "toolArgs": []
     },

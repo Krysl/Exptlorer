@@ -32,23 +32,13 @@ class LogGrpcClient {
 
   bool get isConnected => _channel != null;
 
-  /// Map [LogLevel] to proto [Level].
-  static Level _level(LogLevel l) => switch (l) {
-    LogLevel.debug => Level.LEVEL_DEBUG,
-    LogLevel.info => Level.LEVEL_INFO,
-    LogLevel.warning => Level.LEVEL_WARNING,
-    LogLevel.error => Level.LEVEL_ERROR,
-    LogLevel.critical => Level.LEVEL_CRITICAL,
-    LogLevel.verbose => Level.LEVEL_VERBOSE,
-  };
-
   /// Send one log entry (fire-and-forget).
   void sendLog(TalkerLog log, {LogLevel level = LogLevel.info}) {
     final channel = _channel;
     if (channel == null) return;
 
     final entry = LogEntry(
-      level: _level(level),
+      level: level.toLevel(),
       title: log.title ?? '',
       message: log.message,
       time: fixnum.Int64(DateTime.now().microsecondsSinceEpoch),

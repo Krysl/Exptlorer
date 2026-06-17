@@ -20,20 +20,20 @@ const Level$json = {
   '1': 'Level',
   '2': [
     {'1': 'LEVEL_UNSPECIFIED', '2': 0},
-    {'1': 'LEVEL_DEBUG', '2': 1},
-    {'1': 'LEVEL_INFO', '2': 2},
+    {'1': 'LEVEL_CRITICAL', '2': 1},
+    {'1': 'LEVEL_ERROR', '2': 2},
     {'1': 'LEVEL_WARNING', '2': 3},
-    {'1': 'LEVEL_ERROR', '2': 4},
-    {'1': 'LEVEL_CRITICAL', '2': 5},
+    {'1': 'LEVEL_INFO', '2': 4},
+    {'1': 'LEVEL_DEBUG', '2': 5},
     {'1': 'LEVEL_VERBOSE', '2': 6},
   ],
 };
 
 /// Descriptor for `Level`. Decode as a `google.protobuf.EnumDescriptorProto`.
 final $typed_data.Uint8List levelDescriptor = $convert.base64Decode(
-    'CgVMZXZlbBIVChFMRVZFTF9VTlNQRUNJRklFRBAAEg8KC0xFVkVMX0RFQlVHEAESDgoKTEVWRU'
-    'xfSU5GTxACEhEKDUxFVkVMX1dBUk5JTkcQAxIPCgtMRVZFTF9FUlJPUhAEEhIKDkxFVkVMX0NS'
-    'SVRJQ0FMEAUSEQoNTEVWRUxfVkVSQk9TRRAG');
+    'CgVMZXZlbBIVChFMRVZFTF9VTlNQRUNJRklFRBAAEhIKDkxFVkVMX0NSSVRJQ0FMEAESDwoLTE'
+    'VWRUxfRVJST1IQAhIRCg1MRVZFTF9XQVJOSU5HEAMSDgoKTEVWRUxfSU5GTxAEEg8KC0xFVkVM'
+    'X0RFQlVHEAUSEQoNTEVWRUxfVkVSQk9TRRAG');
 
 @$core.Deprecated('Use logEntryDescriptor instead')
 const LogEntry$json = {

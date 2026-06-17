@@ -4,6 +4,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:window_manager/window_manager.dart';
 
 import 'setting/theme/theme.dart';
+import 'utils/log.dart';
 import 'view/home.dart';
 import 'view/log_settings_page.dart';
 import 'window.dart';
@@ -96,7 +97,7 @@ class _NavigationState extends ConsumerState<Navigation> {
       pane: NavigationPane(
         selected: _index,
         onChanged: (index) {
-          debugPrint('Changed to $index');
+          log.debug('Changed to $index');
           setState(() => _index = index);
         },
         header: SizedBox(

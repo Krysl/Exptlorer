@@ -18,26 +18,26 @@ import 'package:protobuf/protobuf.dart' as $pb;
 class Level extends $pb.ProtobufEnum {
   static const Level LEVEL_UNSPECIFIED =
       Level._(0, _omitEnumNames ? '' : 'LEVEL_UNSPECIFIED');
-  static const Level LEVEL_DEBUG =
-      Level._(1, _omitEnumNames ? '' : 'LEVEL_DEBUG');
-  static const Level LEVEL_INFO =
-      Level._(2, _omitEnumNames ? '' : 'LEVEL_INFO');
+  static const Level LEVEL_CRITICAL =
+      Level._(1, _omitEnumNames ? '' : 'LEVEL_CRITICAL');
+  static const Level LEVEL_ERROR =
+      Level._(2, _omitEnumNames ? '' : 'LEVEL_ERROR');
   static const Level LEVEL_WARNING =
       Level._(3, _omitEnumNames ? '' : 'LEVEL_WARNING');
-  static const Level LEVEL_ERROR =
-      Level._(4, _omitEnumNames ? '' : 'LEVEL_ERROR');
-  static const Level LEVEL_CRITICAL =
-      Level._(5, _omitEnumNames ? '' : 'LEVEL_CRITICAL');
+  static const Level LEVEL_INFO =
+      Level._(4, _omitEnumNames ? '' : 'LEVEL_INFO');
+  static const Level LEVEL_DEBUG =
+      Level._(5, _omitEnumNames ? '' : 'LEVEL_DEBUG');
   static const Level LEVEL_VERBOSE =
       Level._(6, _omitEnumNames ? '' : 'LEVEL_VERBOSE');
 
   static const $core.List<Level> values = <Level>[
     LEVEL_UNSPECIFIED,
-    LEVEL_DEBUG,
-    LEVEL_INFO,
-    LEVEL_WARNING,
-    LEVEL_ERROR,
     LEVEL_CRITICAL,
+    LEVEL_ERROR,
+    LEVEL_WARNING,
+    LEVEL_INFO,
+    LEVEL_DEBUG,
     LEVEL_VERBOSE,
   ];
 

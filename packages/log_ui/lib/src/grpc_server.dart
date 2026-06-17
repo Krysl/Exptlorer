@@ -27,20 +27,9 @@ class LogGrpcService extends Service {
 
   final Talker _talker;
 
-  /// Map proto [Level] to [LogLevel].
-  static LogLevel _level(Level l) {
-    if (l == Level.LEVEL_DEBUG) return LogLevel.debug;
-    if (l == Level.LEVEL_INFO) return LogLevel.info;
-    if (l == Level.LEVEL_WARNING) return LogLevel.warning;
-    if (l == Level.LEVEL_ERROR) return LogLevel.error;
-    if (l == Level.LEVEL_CRITICAL) return LogLevel.critical;
-    if (l == Level.LEVEL_VERBOSE) return LogLevel.verbose;
-    return LogLevel.info;
-  }
-
   Future<Empty> _sendLog(ServiceCall call, Future<LogEntry> entryFuture) async {
     final entry = await entryFuture;
-    final level = _level(entry.level);
+    final level = entry.level.toLogLevel();
 
     _talker.logCustom(
       TalkerLog(
@@ -57,27 +46,40 @@ class LogGrpcService extends Service {
 
 /// Manages the gRPC server lifecycle.
 class LogGrpcServerManager {
+  LogGrpcServerManager({
+    required this.talker,
+  });
+  Talker talker;
   Server? _server;
 
   bool get isRunning => _server != null;
 
   /// Start the gRPC server.
   Future<void> start({
-    required Talker talker,
     String host = '0.0.0.0',
     int port = 50051,
   }) async {
     await stop();
 
-    _server = Server.create(services: [LogGrpcService(talker)]);
+    _server = Server.create(
+      services: [
+        LogGrpcService(talker), //
+      ],
+    );
 
-    await _server!.serve(address: host, port: port);
+    await _server!.serve(
+      address: host, //
+      port: port,
+    );
     talker.info('gRPC log server started: $host:$port');
   }
 
   /// Stop the gRPC server.
   Future<void> stop() async {
     await _server?.shutdown();
+    if (_server != null) {
+      talker.info('gRPC log server stoped');
+    }
     _server = null;
   }
 }

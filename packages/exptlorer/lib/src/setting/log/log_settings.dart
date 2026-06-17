@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -17,20 +18,7 @@ enum GrpcConnectionStatus {
   disconnected,
   connecting,
   connected,
-  error;
-
-  String get label {
-    switch (this) {
-      case GrpcConnectionStatus.disconnected:
-        return 'Disconnected';
-      case GrpcConnectionStatus.connecting:
-        return 'Connecting…';
-      case GrpcConnectionStatus.connected:
-        return 'Connected';
-      case GrpcConnectionStatus.error:
-        return 'Error';
-    }
-  }
+  error, //
 }
 
 class FakeObserver extends TalkerObserver {
@@ -46,6 +34,7 @@ abstract class LogSettingsState with _$LogSettingsState {
     @Default(50051) int grpcPort,
     @Default(LogLevel.info) LogLevel logLevel,
     @Default(GrpcConnectionStatus.disconnected) GrpcConnectionStatus connectionStatus,
+    @Default(false) bool showConsoleOutput,
   }) = _LogSettingsState;
 }
 
@@ -69,11 +58,23 @@ class LogSettingsController extends _$LogSettingsController {
         ..info('Talker logging enabled (from CLI)')
         ..info('Config: $cliConfig');
     }
+    final port = cliConfig.grpcPort;
+    if (cliConfig.autoConnect) {
+      log.info('auto connecting...');
+      unawaited(
+        Future.microtask(
+          () => connect(cliConfig.grpcHost, port).then((_) {
+            log.info('auto connected.');
+          }),
+        ),
+      );
+    }
     return LogSettingsState(
       enableTalker: cliConfig.enableTalker,
       grpcHost: cliConfig.grpcHost,
-      grpcPort: cliConfig.grpcPort ?? 50051,
+      grpcPort: cliConfig.grpcPort,
       logLevel: cliConfig.logLevel,
+      showConsoleOutput: cliConfig.showConsoleOutput,
     );
   }
 
@@ -128,7 +129,10 @@ class LogSettingsController extends _$LogSettingsController {
       // 4. Register log observer.
       _observer = LogGrpcObserver(_grpcClient);
       log
-        ..configure(observer: _observer)
+        ..configure(
+          observer: _observer,
+          settings: TalkerSettings(useConsoleLogs: state.showConsoleOutput),
+        )
         ..info('Connected to log server $host:$port, forwarding logs…');
       state = state.copyWith(connectionStatus: GrpcConnectionStatus.connected);
     } on SocketException catch (e) {
@@ -144,7 +148,7 @@ class LogSettingsController extends _$LogSettingsController {
 
   /// Disconnect from gRPC server.
   Future<void> disconnect() async {
-    log.configure(observer: const FakeObserver());
+    log.configure(observer: const FakeObserver(), settings: TalkerSettings());
     _observer = null;
     await _grpcClient.disconnect();
     log.info('Disconnected from gRPC server');

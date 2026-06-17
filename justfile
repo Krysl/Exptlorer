@@ -11,7 +11,7 @@ cb:
   cd packages/rust && cargo build
 
 br:
-  dart run build_runner watch
+  cd packages/exptlorer && dart run build_runner watch
 
 frb:
   flutter_rust_bridge_codegen generate --watch

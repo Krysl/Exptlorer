@@ -11,6 +11,7 @@ resolution: workspace
 dependencies:
   fixnum: ^1.1.1
   protobuf: ^6.0.0
+  talker: ^5.1.17
   # path: ^1.9.0
 
 dev_dependencies:
