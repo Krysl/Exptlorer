@@ -9,7 +9,7 @@ crate-type = ["cdylib", "staticlib"]
 [dependencies]
 flutter_rust_bridge = "=2.12.0"
 sysinfo = "0.39.3"
-doc_from = { path = "../packages/doc_from" }
+doc_from = { path = "../doc_from" }
 windows-sys = { version = "0.61.2", features = [
     "Win32_UI_Shell",
     "Win32_UI_WindowsAndMessaging",

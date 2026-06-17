@@ -1,0 +1,14 @@
+name: exptlorer_packages
+publish_to: none
+environment:
+  sdk: ^3.12.2
+workspace:
+  - packages/exptlorer
+  - packages/log_ui
+  - packages/protos
+  - packages/rust_builder
+dependencies:
+  flutter_rust_bridge: 2.12.0
+dev_dependencies:
+  integration_test:
+    sdk: flutter

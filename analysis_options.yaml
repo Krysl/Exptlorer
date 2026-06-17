@@ -28,7 +28,13 @@ linter:
 # Additional information about this file can be found at
 # https://dart.dev/guides/language/analysis-options
 analyzer:
+  exclude:
+    - packages/rust/target/**
+    - _docs/**
   language:
     strict-casts: true
     strict-inference: true
     strict-raw-types: true
+
+plugins:
+  riverpod_lint: ^3.1.0

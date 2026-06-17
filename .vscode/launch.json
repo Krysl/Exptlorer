@@ -7,7 +7,19 @@
     {
       "name": "exptlorer",
       "request": "launch",
-      "type": "dart"
+      "type": "dart",
+      "program": "${workspaceFolder}/packages/exptlorer/lib/main.dart",
+      "args": [
+        "-a",
+        "--talker",
+        "-a",
+        "--talker-grpc-host=127.0.0.1",
+        "-a",
+        "--talker-grpc-port=50051",
+        "-a",
+        "--log-level=debug"
+      ],
+      "toolArgs": []
     },
     {
       "name": "exptlorer (profile mode)",
