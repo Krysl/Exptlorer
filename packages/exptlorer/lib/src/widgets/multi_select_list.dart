@@ -68,6 +68,7 @@ class MultiSelectList extends StatefulWidget {
     required this.itemBuilder,
     required this.path,
     required this.isDir,
+    this.initSelectItemIndex,
     this.onTapWithoutModifierKeys,
     this.onTapEmpty,
     this.controller,
@@ -79,6 +80,7 @@ class MultiSelectList extends StatefulWidget {
   final int itemCount;
   final Widget Function({required int index, required bool isSelected, required bool isHovered}) itemBuilder;
   final FileSystemEntity Function(int index) path;
+  final int? initSelectItemIndex;
   final bool Function(int index) isDir;
   final void Function(FileSystemEntity? path)? onTapWithoutModifierKeys;
   final void Function()? onTapEmpty;
@@ -103,13 +105,13 @@ class _MultiSelectListState extends State<MultiSelectList> {
   final ScrollController _scrollController = ScrollController();
   final ValueNotifier<int> _repaintNotifier = ValueNotifier(0);
 
-  MultiSelectController get _effectiveCtrl => widget.controller ?? _ctrl;
-
   @override
   void initState() {
     super.initState();
-    _ctrl = MultiSelectController();
-    _effectiveCtrl.syncLength(widget.itemCount);
+    _ctrl = widget.controller ?? MultiSelectController();
+    _ctrl
+      ..syncLength(widget.itemCount)
+      ..setLastSelected(widget.initSelectItemIndex ?? 0);
     _syncKeys();
     _scrollController.addListener(() => _repaintNotifier.value++);
     _ctrl.indexToEntity ??= widget.path;
@@ -138,12 +140,12 @@ class _MultiSelectListState extends State<MultiSelectList> {
   }
 
   void _syncLength() {
-    _effectiveCtrl.syncLength(widget.itemCount);
+    _ctrl.syncLength(widget.itemCount);
     _syncKeys();
   }
 
   void _select(int index) {
-    final ctrl = _effectiveCtrl;
+    final ctrl = _ctrl;
     final instance = HardwareKeyboard.instance;
     if (instance.isControlPressed) {
       ctrl
@@ -179,7 +181,7 @@ class _MultiSelectListState extends State<MultiSelectList> {
         slivers: [
           SliverList(
             delegate: SliverChildBuilderDelegate((ctx, index) {
-              final isSel = _effectiveCtrl.isSelected(index);
+              final isSel = _ctrl.isSelected(index);
               return MouseRegion(
                 onEnter: (_) => setState(() => _hoveredIndex = index),
                 onExit: (_) => setState(() => _hoveredIndex = null),
@@ -225,7 +227,7 @@ class _MultiSelectListState extends State<MultiSelectList> {
     );
     list = Actions(
       actions: <Type, Action<Intent>>{
-        OpenIntent: OpenAction(controller: _effectiveCtrl),
+        OpenIntent: OpenAction(controller: _ctrl),
       },
       child: Focus(focusNode: _focusNode, child: list),
     );
@@ -236,7 +238,7 @@ class _MultiSelectListState extends State<MultiSelectList> {
       foregroundPainter: _GuideOverlayPainter(
         repaint: _repaintNotifier,
         paintKey: _paintKey,
-        gapItemKey: _itemKeys[_effectiveCtrl.lastSelected],
+        gapItemKey: _itemKeys[_ctrl.lastSelected],
         color: theme.accentColor,
         strokeWidth: widget.strokeWidth,
         cornerRadius: widget.cornerRadius,

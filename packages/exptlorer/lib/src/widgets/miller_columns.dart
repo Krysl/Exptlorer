@@ -44,13 +44,12 @@ abstract class MillerColumnListState extends DelegatingList<MillerColumnState> w
     final list = <MillerColumnState>[MillerColumnState.drives()];
     if (tab.uri != null) {
       final path = tab.uri!.toFilePath(windows: true);
-      final a = r'\'.allMatches(path);
+      final a = r'\'.allMatches(path).map((m) => path.substring(0, m.start + 1)).toList();
+      if (!path.endsWith(r'\')) {
+        a.add(path);
+      }
       list.addAll(
-        a.map((m) {
-          final dir = path.substring(0, m.start + 1);
-          assert(dir.endsWith(r'\'), 'dir should end with backslash');
-          return MillerColumnState(path: Directory(dir));
-        }),
+        a.map((dir) => MillerColumnState(path: Directory(dir))),
       );
     }
     final focusNode = FocusNode(debugLabel: "MillerColumns's FocusNode");
@@ -188,6 +187,7 @@ class MillerColumnsController extends _$MillerColumnsController {
             child: (c.path == null)
                 ? DriveList(
                     drives: drives,
+                    selectedPath: state[index + 1].path?.path,
                     showRightGuide: index < state.length - 1,
                     onTapWithoutModifierKeys: (path) => openAside(context, index, path),
                     onTapEmpty: () {
@@ -196,6 +196,7 @@ class MillerColumnsController extends _$MillerColumnsController {
                   )
                 : FileList(
                     dir: c.path! as Directory,
+                    selectedPath: index + 1 < state.length ? state[index + 1].path?.path : null,
                     showRightGuide: index < state.length - 1,
                     onTapWithoutModifierKeys: (path) => openAside(context, index, path),
                   ),

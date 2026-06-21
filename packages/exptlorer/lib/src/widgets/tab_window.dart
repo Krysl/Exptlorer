@@ -4,6 +4,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../model/drives.dart';
 import '../model/id.dart';
 import '../model/window.dart';
+import '../utils/log.dart';
 import 'tab_group.dart';
 
 class TabWindow extends ConsumerStatefulWidget {
@@ -34,6 +35,7 @@ class _TabWindowState extends ConsumerState<TabWindow> {
                   child: Icon(FluentIcons.cell_split_vertical),
                 ),
                 onPressed: () {
+                  log.debugEx('add new tab', title: 'TabWindow', tags: ['TabWindow', 'tab', 'add']);
                   windowCtl.addNewTabGroup();
                 },
               ),

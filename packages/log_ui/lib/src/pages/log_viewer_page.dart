@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 // ignore: implementation_imports
 import 'package:talker_flutter/src/controller/talker_view_controller.dart';
@@ -88,7 +90,7 @@ class _LogViewerPageState extends State<LogViewerPage> {
 
   @override
   Widget build(BuildContext context) {
-    print(filterOuts);
+    widget.talker.debug(filterOuts);
     return Column(
       children: [
         Expanded(
@@ -126,7 +128,7 @@ class _LogViewerPageState extends State<LogViewerPage> {
                   }
                 }
                 if (changed) {
-                  Future.microtask(() => setState(() {}));
+                  unawaited(Future.microtask(() => setState(() {})));
                 }
               }
               return GestureDetector(

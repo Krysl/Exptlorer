@@ -115,12 +115,14 @@ class DriveList extends StatefulWidget {
   const DriveList({
     super.key,
     required this.drives,
+    this.selectedPath,
     this.onTapWithoutModifierKeys,
     this.onTapEmpty,
     this.showRightGuide = false,
   });
 
   final Drives drives;
+  final String? selectedPath;
   final void Function(FileSystemEntity? path)? onTapWithoutModifierKeys;
   final void Function()? onTapEmpty;
   final bool showRightGuide;
@@ -130,12 +132,29 @@ class DriveList extends StatefulWidget {
 }
 
 class _DriveListState extends State<DriveList> {
+  late final MultiSelectController controller;
+  @override
+  void initState() {
+    super.initState();
+    controller = .new();
+  }
+
+  bool _inited = false;
   @override
   Widget build(BuildContext context) {
     final drives = widget.drives.drives;
+    int? lastSelected;
+    if (!_inited) {
+      lastSelected = widget.selectedPath != null
+          ? drives.indexWhere((drive) => widget.selectedPath!.startsWith(drive.mountPoint))
+          : 0;
+      _inited = true;
+    }
+
     return LayoutBuilder(
       builder: (context, constraints) {
         return MultiSelectList(
+          controller: controller,
           itemCount: drives.length,
           itemBuilder: ({required index, required isSelected, required isHovered}) {
             final drive = drives[index];
@@ -148,6 +167,7 @@ class _DriveListState extends State<DriveList> {
           },
           path: (index) => Directory(drives[index].mountPoint),
           isDir: (_) => true,
+          initSelectItemIndex: lastSelected,
           showRightGuide: widget.showRightGuide,
           onTapWithoutModifierKeys: widget.onTapWithoutModifierKeys,
           onTapEmpty: widget.onTapEmpty,

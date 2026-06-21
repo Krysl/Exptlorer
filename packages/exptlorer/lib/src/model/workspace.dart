@@ -7,6 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
 
+import '../app.dart';
 import '../utils/log.dart';
 import 'id.dart';
 import 'tab.dart';
@@ -38,7 +39,7 @@ abstract class ExWorkspace extends IdBase<ExWorkspace> with _$ExWorkspace {
 class WorkspaceController extends _$WorkspaceController {
   Future<File> _getFileByName(String name) async {
     final dir = await getApplicationDocumentsDirectory();
-    final file = File(path.join(dir.path, name));
+    final file = File(path.join(dir.path, appTitle, '$name.json'));
     return file;
   }
 

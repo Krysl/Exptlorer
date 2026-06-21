@@ -58,9 +58,11 @@ class FileList extends StatefulWidget {
     this.onTapWithoutModifierKeys,
     this.onTapEmpty,
     this.showRightGuide = false,
+    this.selectedPath,
   });
 
   final Directory dir;
+  final String? selectedPath;
   final void Function(FileSystemEntity? path)? onTapWithoutModifierKeys;
   final void Function()? onTapEmpty;
   final bool showRightGuide;
@@ -70,9 +72,20 @@ class FileList extends StatefulWidget {
 }
 
 class _FileListState extends State<FileList> {
+  late final MultiSelectController controller;
+  @override
+  void initState() {
+    super.initState();
+    controller = .new();
+  }
+
   @override
   Widget build(BuildContext context) {
     final fileList = widget.dir.listSync();
+
+    final initSelectItemIndex = widget.selectedPath != null
+        ? fileList.indexWhere((drive) => widget.selectedPath!.startsWith(drive.path))
+        : null;
     return MultiSelectList(
       itemCount: fileList.length,
       itemBuilder: ({required index, required isSelected, required isHovered}) {
@@ -85,6 +98,7 @@ class _FileListState extends State<FileList> {
       },
       path: (index) => fileList[index],
       isDir: (index) => fileList[index].isDir,
+      initSelectItemIndex: initSelectItemIndex,
       showRightGuide: widget.showRightGuide,
       onTapWithoutModifierKeys: widget.onTapWithoutModifierKeys,
       onTapEmpty: widget.onTapEmpty,
