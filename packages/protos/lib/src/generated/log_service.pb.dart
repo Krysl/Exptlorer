@@ -29,12 +29,16 @@ class LogEntry extends $pb.GeneratedMessage {
     $core.String? title,
     $core.String? message,
     $fixnum.Int64? time,
+    $core.String? key,
+    $core.Iterable<$core.String>? tags,
   }) {
     final result = create();
     if (level != null) result.level = level;
     if (title != null) result.title = title;
     if (message != null) result.message = message;
     if (time != null) result.time = time;
+    if (key != null) result.key = key;
+    if (tags != null) result.tags.addAll(tags);
     return result;
   }
 
@@ -55,6 +59,8 @@ class LogEntry extends $pb.GeneratedMessage {
     ..aOS(2, _omitFieldNames ? '' : 'title')
     ..aOS(3, _omitFieldNames ? '' : 'message')
     ..aInt64(4, _omitFieldNames ? '' : 'time')
+    ..aOS(5, _omitFieldNames ? '' : 'key')
+    ..pPS(6, _omitFieldNames ? '' : 'tags')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -114,6 +120,18 @@ class LogEntry extends $pb.GeneratedMessage {
   $core.bool hasTime() => $_has(3);
   @$pb.TagNumber(4)
   void clearTime() => $_clearField(4);
+
+  @$pb.TagNumber(5)
+  $core.String get key => $_getSZ(4);
+  @$pb.TagNumber(5)
+  set key($core.String value) => $_setString(4, value);
+  @$pb.TagNumber(5)
+  $core.bool hasKey() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearKey() => $_clearField(5);
+
+  @$pb.TagNumber(6)
+  $pb.PbList<$core.String> get tags => $_getList(5);
 }
 
 /// / Empty response.

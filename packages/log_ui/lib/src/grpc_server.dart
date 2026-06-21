@@ -37,6 +37,8 @@ class LogGrpcService extends Service {
         title: entry.title,
         logLevel: level,
         time: DateTime.fromMicrosecondsSinceEpoch(entry.time.toInt()),
+        key: entry.key,
+        tags: entry.tags,
       ),
     );
 

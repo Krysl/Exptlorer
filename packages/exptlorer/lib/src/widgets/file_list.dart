@@ -56,11 +56,13 @@ class FileList extends StatefulWidget {
     super.key,
     required this.dir,
     this.onTapWithoutModifierKeys,
+    this.onTapEmpty,
     this.showRightGuide = false,
   });
 
   final Directory dir;
   final void Function(FileSystemEntity? path)? onTapWithoutModifierKeys;
+  final void Function()? onTapEmpty;
   final bool showRightGuide;
 
   @override
@@ -85,6 +87,7 @@ class _FileListState extends State<FileList> {
       isDir: (index) => fileList[index].isDir,
       showRightGuide: widget.showRightGuide,
       onTapWithoutModifierKeys: widget.onTapWithoutModifierKeys,
+      onTapEmpty: widget.onTapEmpty,
     );
   }
 }

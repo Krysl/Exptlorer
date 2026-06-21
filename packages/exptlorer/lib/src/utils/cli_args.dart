@@ -52,7 +52,7 @@ final _parser = ArgParser()
   )
   ..addOption(
     _CmdArgs.talkerGprcHost,
-    abbr: 'h',
+    abbr: 'H',
     help: 'gRPC log server host',
     valueHelp: 'HOST',
     defaultsTo: hostDefault,

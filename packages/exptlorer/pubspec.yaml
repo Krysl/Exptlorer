@@ -46,9 +46,11 @@ dependencies:
   grpc: ^5.1.0
   hooks_riverpod: ^3.1.0
   image: ^4.9.1
+  json_annotation: ^4.11.0
   log_ui_proto:
     path: ../protos
   path: ^1.9.1
+  path_provider: ^2.1.6
   protobuf: ^6.0.0
   riverpod_annotation: ^4.0.0
   rust_lib_exptlorer:
@@ -75,6 +77,7 @@ dev_dependencies:
   freezed: ^3.2.3
   integration_test:
     sdk: flutter
+  json_serializable: ^6.13.0
   riverpod_generator: ^4.0.0+1
   riverpod_lint: ^3.1.0
   very_good_analysis: ^10.2.0

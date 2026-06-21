@@ -1,0 +1,7 @@
+targets:
+  $default:
+    builders:
+      json_serializable:
+        options:
+          # 关键配置：允许显式嵌套调用 toJson()
+          explicit_to_json: false

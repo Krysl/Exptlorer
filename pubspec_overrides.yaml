@@ -1,0 +1,12 @@
+
+dependency_overrides:
+  talker:
+    path: K:\flutter\pub\talker\packages\talker
+  talker_flutter:
+    path: K:\flutter\pub\talker\packages\talker_flutter
+  talker_grpc_logger:
+    path: K:\flutter\pub\talker\packages\talker_grpc_logger
+  talker_logger:
+    path: K:\flutter\pub\talker\packages\talker_logger
+  talker_riverpod_logger:
+    path: K:\flutter\pub\talker\packages\talker_riverpod_logger

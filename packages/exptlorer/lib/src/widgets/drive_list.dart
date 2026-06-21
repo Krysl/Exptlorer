@@ -47,7 +47,7 @@ class _DriveItemState extends ConsumerState<DriveItem> {
                       crossAxisAlignment: .stretch,
                       spacing: 10,
                       children: [
-                        Row(children: buildLable()),
+                        Row(mainAxisAlignment: .spaceBetween, children: buildLable()),
                         buildProcessBar(),
                       ],
                     ),
@@ -91,7 +91,22 @@ class _DriveItemState extends ConsumerState<DriveItem> {
       widget.width, //
       [Text(driveName)],
       [Text(driveName)],
-      [Text('${widget.drive.name} ($driveName)'), const Spacer(), Text(gb)],
+      [
+        Expanded(
+          child: Row(
+            children: [
+              Flexible(
+                child: Text(
+                  widget.drive.name,
+                  overflow: .ellipsis,
+                ),
+              ),
+              Text('($driveName)'),
+            ],
+          ),
+        ),
+        Text(gb),
+      ],
     );
   }
 }
@@ -101,11 +116,13 @@ class DriveList extends StatefulWidget {
     super.key,
     required this.drives,
     this.onTapWithoutModifierKeys,
+    this.onTapEmpty,
     this.showRightGuide = false,
   });
 
   final Drives drives;
   final void Function(FileSystemEntity? path)? onTapWithoutModifierKeys;
+  final void Function()? onTapEmpty;
   final bool showRightGuide;
 
   @override
@@ -133,6 +150,7 @@ class _DriveListState extends State<DriveList> {
           isDir: (_) => true,
           showRightGuide: widget.showRightGuide,
           onTapWithoutModifierKeys: widget.onTapWithoutModifierKeys,
+          onTapEmpty: widget.onTapEmpty,
         );
       },
     );

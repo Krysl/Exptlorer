@@ -34,6 +34,10 @@ message LogEntry {
 
   /// ISO-8601 timestamp (maps to TalkerData.time).
   int64 time = 4;
+
+  optional string key = 5;
+
+  repeated string tags = 6;
 }
 
 /// Empty response.

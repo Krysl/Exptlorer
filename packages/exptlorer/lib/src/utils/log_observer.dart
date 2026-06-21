@@ -42,6 +42,8 @@ class LogGrpcClient {
       title: log.title ?? '',
       message: log.message,
       time: fixnum.Int64(DateTime.now().microsecondsSinceEpoch),
+      key: log.key,
+      tags: (log.tags as List<String>?) ?? [],
     );
 
     // Fire-and-forget: consume the response stream to avoid unhandled errors.

@@ -1,9 +1,10 @@
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_acrylic/flutter_acrylic.dart' as flutter_acrylic;
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import 'actions/open.dart';
+import 'actions/workspace.dart';
+import 'setting/log/log_settings.dart';
 import 'setting/theme/theme.dart';
 import 'window.dart';
 
@@ -16,7 +17,7 @@ class MyApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final appThemeData = ref.watch(appThemeProvider);
     final appTheme = ref.watch(appThemeProvider.notifier);
-
+    ref.read(logSettingsControllerProvider);
     return FluentApp(
       title: appTitle,
       themeMode: appThemeData.mode,
@@ -39,7 +40,8 @@ class MyApp extends ConsumerWidget {
         );
         return Shortcuts(
           shortcuts: <LogicalKeySet, Intent>{
-            LogicalKeySet(LogicalKeyboardKey.enter): const OpenIntent(),
+            LogicalKeySet(.enter): const OpenIntent(),
+            LogicalKeySet(.control, .keyS): const SaveWorkspaceIntent(),
           },
           child: widget,
         );

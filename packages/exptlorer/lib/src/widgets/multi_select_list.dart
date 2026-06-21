@@ -69,6 +69,7 @@ class MultiSelectList extends StatefulWidget {
     required this.path,
     required this.isDir,
     this.onTapWithoutModifierKeys,
+    this.onTapEmpty,
     this.controller,
     this.showRightGuide = false,
     this.strokeWidth = 3,
@@ -80,6 +81,7 @@ class MultiSelectList extends StatefulWidget {
   final FileSystemEntity Function(int index) path;
   final bool Function(int index) isDir;
   final void Function(FileSystemEntity? path)? onTapWithoutModifierKeys;
+  final void Function()? onTapEmpty;
   final MultiSelectController? controller;
   final double strokeWidth;
   final double cornerRadius;
@@ -211,7 +213,10 @@ class _MultiSelectListState extends State<MultiSelectList> {
             hasScrollBody: false,
             child: GestureDetector(
               behavior: HitTestBehavior.translucent,
-              onTap: () => widget.onTapWithoutModifierKeys?.call(null),
+              onTap: () {
+                widget.onTapWithoutModifierKeys?.call(null);
+                widget.onTapEmpty?.call();
+              },
               child: const SizedBox.expand(),
             ),
           ),

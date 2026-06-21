@@ -43,6 +43,11 @@ const LogEntry$json = {
     {'1': 'title', '3': 2, '4': 1, '5': 9, '10': 'title'},
     {'1': 'message', '3': 3, '4': 1, '5': 9, '10': 'message'},
     {'1': 'time', '3': 4, '4': 1, '5': 3, '10': 'time'},
+    {'1': 'key', '3': 5, '4': 1, '5': 9, '9': 0, '10': 'key', '17': true},
+    {'1': 'tags', '3': 6, '4': 3, '5': 9, '10': 'tags'},
+  ],
+  '8': [
+    {'1': '_key'},
   ],
 };
 
@@ -50,7 +55,7 @@ const LogEntry$json = {
 final $typed_data.Uint8List logEntryDescriptor = $convert.base64Decode(
     'CghMb2dFbnRyeRIiCgVsZXZlbBgBIAEoDjIMLmxvZ3VpLkxldmVsUgVsZXZlbBIUCgV0aXRsZR'
     'gCIAEoCVIFdGl0bGUSGAoHbWVzc2FnZRgDIAEoCVIHbWVzc2FnZRISCgR0aW1lGAQgASgDUgR0'
-    'aW1l');
+    'aW1lEhUKA2tleRgFIAEoCUgAUgNrZXmIAQESEgoEdGFncxgGIAMoCVIEdGFnc0IGCgRfa2V5');
 
 @$core.Deprecated('Use emptyDescriptor instead')
 const Empty$json = {

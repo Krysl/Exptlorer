@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:collection/collection.dart';
@@ -7,6 +8,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../model/drives.dart';
+import '../model/id.dart';
 import '../model/tab.dart';
 import '../utils/log.dart';
 import 'drive_list.dart';
@@ -33,25 +35,62 @@ abstract class MillerColumnListState extends DelegatingList<MillerColumnState> w
   factory MillerColumnListState({
     required ExTab tab,
     required List<MillerColumnState> base,
+    required FocusNode focusNode,
   }) = _MillerColumnListState;
 
   MillerColumnListState._(super.base) : _base = base;
 
-  factory MillerColumnListState.init(ExTab tab) => _MillerColumnListState(tab: tab, base: [MillerColumnState.drives()]);
+  factory MillerColumnListState.init(ExTab tab) {
+    final list = <MillerColumnState>[MillerColumnState.drives()];
+    if (tab.uri != null) {
+      final path = tab.uri!.toFilePath(windows: true);
+      final a = r'\'.allMatches(path);
+      list.addAll(
+        a.map((m) {
+          final dir = path.substring(0, m.start + 1);
+          assert(dir.endsWith(r'\'), 'dir should end with backslash');
+          return MillerColumnState(path: Directory(dir));
+        }),
+      );
+    }
+    final focusNode = FocusNode(debugLabel: "MillerColumns's FocusNode");
+    return _MillerColumnListState(tab: tab, base: list, focusNode: focusNode);
+  }
 
   @override
   final List<MillerColumnState> _base;
 
   @override
   List<MillerColumnState> get base => _base;
+
+  String? get path => isNotEmpty ? last.path?.path : null;
+  Uri? get uri {
+    final p = path;
+    return p != null ? .file(p, windows: true) : null;
+  }
 }
 
 typedef MillerColumnLayout = ({double offset, double width});
 
-@riverpod
+@Riverpod(keepAlive: true)
 class MillerColumnsController extends _$MillerColumnsController {
   @override
-  MillerColumnListState build(ExTab tab) {
+  MillerColumnListState build(IdWrapper<ExTab> tabId) {
+    final t = ref.read(exTabControllerProvider(tabId).notifier);
+    final tab = ref.read(exTabControllerProvider(tabId));
+    listenSelf((prev, next) {
+      unawaited(
+        Future.microtask(() {
+          log.debugEx('uri: ${next.uri}', title: 'Miller', tags: ['miller', 'state']);
+          t.updateUri(next.uri);
+        }),
+      );
+    });
+    ref.onDispose(() {
+      log.debugEx('uri: ${tab.uri}', title: 'Miller', tags: ['miller', 'dispose']);
+      state.focusNode.dispose();
+    });
+    log.debugEx('uri: ${tab.uri}', title: 'Miller', tags: ['miller', 'build']);
     return MillerColumnListState.init(tab);
   }
 
@@ -90,8 +129,43 @@ class MillerColumnsController extends _$MillerColumnsController {
     throw UnimplementedError('calcWidths');
   }
 
+  Widget? buildEmpty(
+    List<MillerColumnLayout> layouts,
+    BoxConstraints constraints,
+    // ignore: riverpod_lint/avoid_build_context_in_providers
+    BuildContext context,
+  ) {
+    final last = layouts.lastOrNull;
+    if (last != null) {
+      final (offset: a, width: b) = last;
+      final w = constraints.maxWidth - a - b;
+      return Positioned(
+        left: a + b,
+        width: w,
+        child: SizedBox(
+          width: w,
+          height: constraints.maxHeight,
+          child: Focus(
+            focusNode: state.focusNode,
+            child: GestureDetector(
+              onTap: () {
+                state.focusNode.requestFocus();
+                log.debugEx(
+                  'miller empty onTap ${state.focusNode}',
+                  title: 'Miller',
+                  tags: ['miller', 'empty', 'onTap'],
+                );
+              },
+              child: const ColoredBox(color: Colors.black),
+            ),
+          ),
+        ),
+      );
+    }
+    return null;
+  }
+
   List<Widget> buildChildren(
-    //
     // ignore: riverpod_lint/avoid_build_context_in_providers
     BuildContext context,
     BoxConstraints constraints,
@@ -100,6 +174,7 @@ class MillerColumnsController extends _$MillerColumnsController {
     FluentThemeData theme,
   ) {
     final layouts = calcWidths(constraints.maxWidth, size, state.length);
+    final empty = buildEmpty(layouts, constraints, context);
     final children = state.mapIndexed((index, c) {
       final layout = layouts[index];
       return Positioned(
@@ -115,6 +190,9 @@ class MillerColumnsController extends _$MillerColumnsController {
                     drives: drives,
                     showRightGuide: index < state.length - 1,
                     onTapWithoutModifierKeys: (path) => openAside(context, index, path),
+                    onTapEmpty: () {
+                      state.focusNode.requestFocus();
+                    },
                   )
                 : FileList(
                     dir: c.path! as Directory,
@@ -125,11 +203,10 @@ class MillerColumnsController extends _$MillerColumnsController {
         ),
       );
     }).toList();
-    log.debugEx('buildChildren: children = $children', title: 'Miller');
-    return children;
+    log.debugEx('children = $children', title: 'Miller', tags: ['miller', 'buildChildren']);
+    return [...children, ?empty];
   }
 
-  //
   // ignore: riverpod_lint/avoid_build_context_in_providers
   void openAside(BuildContext context, int index, FileSystemEntity? path) {
     var newState = state;
@@ -145,10 +222,9 @@ class MillerColumnsController extends _$MillerColumnsController {
       }
       state = newState;
     }
-    log.debugEx('onTap: $state', title: 'Miller');
+    log.debugEx('onTap: $state', title: 'Miller', tags: ['miller', 'openAside']);
   }
 
-  //
   // ignore: riverpod_lint/avoid_build_context_in_providers
   void showError(BuildContext context, String title, String? msg) => displayInfoBar(
     context,
@@ -192,29 +268,41 @@ class MillerColumns extends ConsumerStatefulWidget {
     super.key,
     required this.tab,
     required this.drives,
-    required this.controller,
+    this.controller,
     this.size = const MillerColumnsSize(),
   });
 
   final MillerColumnsSize size;
 
-  final ExTab tab;
+  final IdWrapper<ExTab> tab;
   final Drives drives;
-  final MillerColumnsController controller;
+  final MillerColumnsController? controller;
 
   @override
   ConsumerState<MillerColumns> createState() => _MillerColumnsState();
 }
 
 class _MillerColumnsState extends ConsumerState<MillerColumns> {
+  late final MillerColumnsController controller;
+  @override
+  void initState() {
+    super.initState();
+    if (widget.controller != null) {
+      controller = widget.controller!;
+    } else {
+      final ctl = ref.read(millerColumnsControllerProvider(widget.tab).notifier);
+      controller = ctl;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    ref.watch(millerColumnsControllerProvider(widget.tab));
-    log.debugEx('MillerColumns rebuild, ${widget.tab}', title: 'Miller');
+    final s = ref.watch(millerColumnsControllerProvider(widget.tab));
+    log.debugEx('MillerColumns rebuild, ${widget.tab} ${s.path}', title: 'Miller', tags: ['miller', 'build']);
     final theme = FluentTheme.of(context);
     return LayoutBuilder(
       builder: (context, constraints) => Stack(
-        children: widget.controller.buildChildren(
+        children: controller.buildChildren(
           context,
           constraints,
           widget.size,

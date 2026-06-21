@@ -18,7 +18,7 @@ class OpenAction extends Action<OpenIntent> {
   @override
   Object? invoke(OpenIntent intent) {
     final entitys = controller.selectedEntitys.toList();
-    log.debugEx('open $entitys', title: 'Action');
+    log.debugEx('open $entitys', title: 'Action', tags: ['action']);
     for (final entity in entitys) {
       unawaited(openPath(path: entity.path));
     }

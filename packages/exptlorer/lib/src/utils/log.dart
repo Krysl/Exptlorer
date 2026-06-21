@@ -12,9 +12,9 @@ extension LogLevelFrom on LogLevel {
 final log = Talker();
 
 extension TalkerEx on Talker {
-  void debugEx(dynamic msg, {String? title}) {
+  void debugEx(dynamic msg, {String? title, List<String>? tags}) {
     logCustom(
-      TalkerLog(msg.toString(), title: title, logLevel: LogLevel.debug),
+      TalkerLog(msg.toString(), title: title, tags: tags, logLevel: LogLevel.debug),
     );
   }
 }
