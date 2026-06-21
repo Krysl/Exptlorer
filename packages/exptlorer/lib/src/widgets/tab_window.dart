@@ -29,15 +29,28 @@ class _TabWindowState extends ConsumerState<TabWindow> {
             child: TabGroupWidget(
               tabGroupId: group.wrap(),
               drives: widget.drives,
-              tabsEndIcon: IconButton(
-                icon: const RotatedBox(
-                  quarterTurns: 1, //
-                  child: Icon(FluentIcons.cell_split_vertical),
-                ),
-                onPressed: () {
-                  log.debugEx('add new tab', title: 'TabWindow', tags: ['TabWindow', 'tab', 'add']);
-                  windowCtl.addNewTabGroup();
-                },
+              tabsEndIcon: Row(
+                children: [
+                  IconButton(
+                    icon: const RotatedBox(
+                      quarterTurns: 1, //
+                      child: Icon(FluentIcons.cell_split_vertical),
+                    ),
+                    onPressed: () {
+                      log.debugEx('add new tab', title: 'TabWindow', tags: ['TabWindow', 'tab', 'add']);
+                      windowCtl.addNewTabGroup();
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(
+                      FluentIcons.delete,
+                    ),
+                    onPressed: () {
+                      log.debugEx('add new tab', title: 'TabWindow', tags: ['TabWindow', 'tab', 'add']);
+                      windowCtl.removeTabGroup(group);
+                    },
+                  ),
+                ],
               ),
             ),
           ),

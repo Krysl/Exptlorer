@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:collection/collection.dart';
 import 'package:fluent_ui/fluent_ui.dart';
@@ -99,27 +100,42 @@ class MillerColumnsController extends _$MillerColumnsController {
     int len,
   ) {
     if (size.maxWidth * len < maxWidth) {
+      final remain = maxWidth - size.maxWidth * len;
       return List.generate(len, (i) {
-        return (offset: size.maxWidth * i, width: size.maxWidth);
+        var w = size.maxWidth;
+        if (i == len - 1) {
+          w += min(remain, size.lastWidth - size.maxWidth);
+        }
+        return (offset: size.maxWidth * i, width: w);
       });
     } else if (size.smallWidth * len < maxWidth) {
-      final maxNum = (maxWidth - size.smallWidth * len) / (size.maxWidth - size.smallWidth);
+      final maxNum = (maxWidth - size.smallWidth * len) ~/ (size.maxWidth - size.smallWidth);
       final smallNum = len - maxNum;
+      final remain = maxWidth - size.maxWidth * maxNum - size.smallWidth * smallNum;
 
       double currentOffset = 0;
       return List.generate(len, (i) {
-        final w = i < smallNum ? size.smallWidth : size.maxWidth;
+        var w = i < smallNum ? size.smallWidth : size.maxWidth;
+        if (i == len - 1) {
+          w += remain;
+        }
         final ofst = currentOffset;
         currentOffset += w;
         return (offset: ofst, width: w);
       });
     } else if (size.minWidth * len < maxWidth) {
-      final smallNum = (maxWidth - size.minWidth * len) / (size.smallWidth - size.minWidth);
-      final smallNum2 = len - smallNum;
+      final smallNum = (maxWidth - size.minWidth * len) ~/ (size.smallWidth - size.minWidth);
+      final minNum = len - smallNum;
+      final minExtStartIndex = minNum > 1 ? 1 : 0;
+      final minExtNum = minNum > 1 ? minNum - 1 : 1;
+      final minExt = (maxWidth - size.minWidth * minNum - size.smallWidth * smallNum) / minExtNum;
 
       double currentOffset = 0;
       return List.generate(len, (i) {
-        final w = i < smallNum2 ? size.smallWidth : size.maxWidth;
+        var w = i < minNum ? size.minWidth : size.smallWidth;
+        if (i >= minExtStartIndex && i < minExtStartIndex + minExtNum) {
+          w += minExt;
+        }
         final ofst = currentOffset;
         currentOffset += w;
         return (offset: ofst, width: w);
@@ -138,6 +154,10 @@ class MillerColumnsController extends _$MillerColumnsController {
     if (last != null) {
       final (offset: a, width: b) = last;
       final w = constraints.maxWidth - a - b;
+      if (w < 0) {
+        return null;
+      }
+
       return Positioned(
         left: a + b,
         width: w,
@@ -176,6 +196,8 @@ class MillerColumnsController extends _$MillerColumnsController {
     final empty = buildEmpty(layouts, constraints, context);
     final children = state.mapIndexed((index, c) {
       final layout = layouts[index];
+      final selectedPath = index + 1 < state.length ? state[index + 1].path?.path : null;
+      final showRightGuide = index < state.length - 1;
       return Positioned(
         left: layout.offset,
         width: layout.width,
@@ -187,8 +209,8 @@ class MillerColumnsController extends _$MillerColumnsController {
             child: (c.path == null)
                 ? DriveList(
                     drives: drives,
-                    selectedPath: state[index + 1].path?.path,
-                    showRightGuide: index < state.length - 1,
+                    selectedPath: selectedPath,
+                    showRightGuide: showRightGuide,
                     onTapWithoutModifierKeys: (path) => openAside(context, index, path),
                     onTapEmpty: () {
                       state.focusNode.requestFocus();
@@ -196,8 +218,8 @@ class MillerColumnsController extends _$MillerColumnsController {
                   )
                 : FileList(
                     dir: c.path! as Directory,
-                    selectedPath: index + 1 < state.length ? state[index + 1].path?.path : null,
-                    showRightGuide: index < state.length - 1,
+                    selectedPath: selectedPath,
+                    showRightGuide: showRightGuide,
                     onTapWithoutModifierKeys: (path) => openAside(context, index, path),
                   ),
           ),
@@ -247,20 +269,22 @@ abstract class MillerColumnsSize with _$MillerColumnsSize {
     @Default(20) double minWidth,
     @Default(120) double smallWidth,
     @Default(230) double maxWidth,
+    @Default(400) double lastWidth,
   }) = _MillerColumnsSize;
 }
 
 extension MillerColumnsSizeHelper on MillerColumnsSize {
-  T whens<T>(num size, T min, T small, T max) {
+  T whens<T>(num size, {required T min, required T small, required T max}) {
     if (size <= minWidth) {
       return min;
     } else if (size <= smallWidth) {
       return small;
-    }
-    {
+    } else {
       return max;
     }
   }
+
+  (bool, bool, bool) size(num size) => (size <= minWidth, size <= maxWidth && size > minWidth, size > maxWidth);
 }
 
 /// [Miller columns](https://en.wikipedia.org/wiki/Miller_columns)

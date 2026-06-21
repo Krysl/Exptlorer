@@ -35,31 +35,40 @@ class _DriveItemState extends ConsumerState<DriveItem> {
     final isDark = FluentTheme.of(context).brightness == .dark;
     return Card(
       backgroundColor: (widget.isHovered || widget.isSelected) ? (isDark ? Colors.grey[130] : Colors.grey[30]) : null,
+      padding: widget.size.whens(
+        widget.width, //
+        min: const .symmetric(vertical: 12),
+        small: const .symmetric(vertical: 12),
+        max: const .all(12),
+      ),
       child: Tooltip(
         message: widget.drive.toString(),
-        child: widget.width > widget.size.smallWidth
-            ? Row(
-                children: [
-                  buildIcon(img),
-                  Expanded(
-                    child: Column(
-                      mainAxisAlignment: .spaceBetween,
-                      crossAxisAlignment: .stretch,
-                      spacing: 10,
-                      children: [
-                        Row(mainAxisAlignment: .spaceBetween, children: buildLable()),
-                        buildProcessBar(),
-                      ],
-                    ),
-                  ),
-                ],
-              )
-            : Column(
-                children: [
-                  Row(children: [buildIcon(img), ...buildLable()]),
-                  buildProcessBar(),
-                ],
+        child: widget.size.whens(
+          widget.width,
+          max: Row(
+            children: [
+              buildIcon(img),
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: .spaceBetween,
+                  crossAxisAlignment: .stretch,
+                  spacing: 10,
+                  children: [
+                    Row(mainAxisAlignment: .spaceBetween, children: buildLable()),
+                    buildProcessBar(),
+                  ],
+                ),
               ),
+            ],
+          ),
+          small: Column(
+            children: [
+              Row(children: [if (widget.width > 40) buildIcon(img), ...buildLable()]),
+              buildProcessBar(),
+            ],
+          ),
+          min: Text(widget.drive.mountPoint.split(r'\').first),
+        ),
       ),
     );
   }
@@ -89,9 +98,9 @@ class _DriveItemState extends ConsumerState<DriveItem> {
     final gb = '${widget.drive.availableSpace.inGB.fixed1} / ${widget.drive.totalSpace.inGB.toInt()} GB';
     return widget.size.whens(
       widget.width, //
-      [Text(driveName)],
-      [Text(driveName)],
-      [
+      min: [Text(driveName)],
+      small: [Text(driveName)],
+      max: [
         Expanded(
           child: Row(
             children: [

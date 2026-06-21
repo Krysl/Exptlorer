@@ -5,16 +5,21 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:path/path.dart' as path;
 
 import '../model/file_icon.dart';
+import 'miller_columns.dart';
 import 'multi_select_list.dart';
 
 class FileItem extends ConsumerStatefulWidget {
   const FileItem({
     super.key,
     required this.entity,
+    this.width = 230,
     this.isSelected = false,
     this.isHovered = false,
+    this.size = const MillerColumnsSize(),
   });
   final FileSystemEntity entity;
+  final double width;
+  final MillerColumnsSize size;
   final bool isSelected;
   final bool isHovered;
 
@@ -28,20 +33,23 @@ class _FileItemState extends ConsumerState<FileItem> {
     final img = ref.watch(fileIconProvider(widget.entity.path));
     final theme = FluentTheme.of(context);
     final isDark = theme.brightness == .dark;
+    final (isMin, isSmall, isMax) = widget.size.size(widget.width);
     return ColoredBox(
       color: (widget.isHovered || widget.isSelected)
           ? (isDark ? Colors.grey[130] : Colors.grey[30])
           : theme.acrylicBackgroundColor,
       child: Row(
         children: [
-          SizedBox.square(
-            dimension: 32,
-            child: img.when(
-              data: (data) => RawImage(image: data),
-              error: (error, st) => Tooltip(message: '$error, $st'),
-              loading: ProgressRing.new,
+          if (!isMin)
+            SizedBox(
+              width: widget.width >= 40 ? 32 : 16,
+              height: 32,
+              child: img.when(
+                data: (data) => RawImage(image: data),
+                error: (error, st) => Tooltip(message: '$error, $st'),
+                loading: ProgressRing.new,
+              ),
             ),
-          ),
           Expanded(
             child: Text(path.basename(widget.entity.path), overflow: .ellipsis),
           ),
@@ -86,22 +94,27 @@ class _FileListState extends State<FileList> {
     final initSelectItemIndex = widget.selectedPath != null
         ? fileList.indexWhere((drive) => widget.selectedPath!.startsWith(drive.path))
         : null;
-    return MultiSelectList(
-      itemCount: fileList.length,
-      itemBuilder: ({required index, required isSelected, required isHovered}) {
-        final entity = fileList[index];
-        return FileItem(
-          entity: entity.absolute,
-          isSelected: isSelected,
-          isHovered: isHovered,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return MultiSelectList(
+          itemCount: fileList.length,
+          itemBuilder: ({required index, required isSelected, required isHovered}) {
+            final entity = fileList[index];
+            return FileItem(
+              entity: entity.absolute,
+              width: constraints.maxWidth,
+              isSelected: isSelected,
+              isHovered: isHovered,
+            );
+          },
+          path: (index) => fileList[index],
+          isDir: (index) => fileList[index].isDir,
+          initSelectItemIndex: initSelectItemIndex,
+          showRightGuide: widget.showRightGuide,
+          onTapWithoutModifierKeys: widget.onTapWithoutModifierKeys,
+          onTapEmpty: widget.onTapEmpty,
         );
       },
-      path: (index) => fileList[index],
-      isDir: (index) => fileList[index].isDir,
-      initSelectItemIndex: initSelectItemIndex,
-      showRightGuide: widget.showRightGuide,
-      onTapWithoutModifierKeys: widget.onTapWithoutModifierKeys,
-      onTapEmpty: widget.onTapEmpty,
     );
   }
 }
