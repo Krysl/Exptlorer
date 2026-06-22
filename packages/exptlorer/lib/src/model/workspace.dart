@@ -22,16 +22,44 @@ abstract class ExWorkspace extends IdBase<ExWorkspace> with _$ExWorkspace {
   const factory ExWorkspace({
     required Id<ExWorkspace> id,
     required String name,
-    @Default([]) List<ExWindow> windows,
+    @Default([]) List<IdWrapper<ExWindow>> windows,
   }) = _ExWorkspace;
 
   const ExWorkspace._({required Id<ExWorkspace> id}) : super.id(id);
 
   factory ExWorkspace.fromJson(Map<String, Object?> json) => _$ExWorkspaceFromJson(json);
+  factory ExWorkspace.empty({Id<ExWorkspace>? id, String? name}) => ExWorkspace(
+    id: id ?? Id.create(),
+    name: name ?? 'Default',
+    windows: [
+      ExWindow(
+        id: Id.create(),
+        name: 'default',
+        groups: [
+          ExTabGroup(
+            id: Id.create(),
+            tabs: [
+              ExTab.create(null).wrap(),
+            ],
+          ).wrap(),
+        ],
+      ).wrap(),
+    ],
+  );
   @override
-  ExWorkspace trueState(Ref ref) {
-    final read = ref.read(exWorkspaceControllerProvider(name));
-    return read.requireValue;
+  ExWorkspace trueState(Ref ref) => ref.read(exWorkspaceControllerProvider(wrap()));
+
+  static Future<ExWorkspace?> loadFromFolder(String id) async {
+    final file = await getWorkspaceFileByName(id);
+    if (file.existsSync()) {
+      final json = await file.readAsString();
+      try {
+        return ExWorkspace.fromJson(jsonDecode(json) as Map<String, Object?>);
+      } catch (e) {
+        log.error('error', e);
+      }
+    }
+    return null;
   }
 }
 
@@ -47,41 +75,15 @@ Future<File> getWorkspaceFileByName(String name) async {
 }
 
 @Riverpod(keepAlive: true)
-class ExWorkspaceController extends _$ExWorkspaceController {
+class ExWorkspaceController extends _$ExWorkspaceController with IdWrapperMixin<ExWorkspace> {
   @override
-  Future<ExWorkspace> build(String name) async {
-    final file = await getWorkspaceFileByName(name);
-    if (file.existsSync()) {
-      final json = await file.readAsString();
-      try {
-        return ExWorkspace.fromJson(jsonDecode(json) as Map<String, Object?>);
-      } catch (e) {
-        log.error('error', e);
-      }
-    }
-    return ExWorkspace(
-      id: Id.create(),
-      name: name,
-      windows: [
-        ExWindow(
-          id: Id.create(),
-          name: 'default',
-          groups: [
-            ExTabGroup(
-              id: Id.create(),
-              tabs: [
-                ExTab.create(null), //
-              ],
-            ),
-          ],
-        ),
-      ],
-    );
-  }
+  ExWorkspace build(IdWrapper<ExWorkspace> id) => buildById(id);
 
-  Future<void> save(String name) async {
-    final file = await getWorkspaceFileByName(name);
-    final data = state.requireValue;
+  String? name() => state.name;
+
+  Future<void> save(Id<ExWorkspace> id) async {
+    final file = await getWorkspaceFileByName(id.id.toString());
+    final data = state;
     final jsonData = data.toJson();
     log.debugEx('save to ${file.path}: $jsonData', title: 'WorkspaceController', tags: ['workspace', 'save']);
     final a = encoder(ref).convert(
@@ -95,14 +97,14 @@ class ExWorkspaceController extends _$ExWorkspaceController {
     return JsonEncoder.withIndent(
       '  ',
       (object) {
-        // Id<T> 是 extension type，运行时擦除为 UuidValue
-        // json.encode 不认识 UuidValue，通过 toEncodable 转成正确格式
         if (object is UuidValue) {
           return {'id': object.toString()};
         } else if (object is IdBase) {
           final trueState = object.trueState(ref);
           log.debugEx('json encode $trueState', title: 'Workspace', tags: ['workspace', 'save', 'json']);
           return trueState.toJson();
+        } else if (object is IdWrapper) {
+          return object.toJson();
         }
         throw JsonUnsupportedObjectError(object);
       },

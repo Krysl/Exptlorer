@@ -13,7 +13,7 @@ abstract class ExWindow extends IdBase<ExWindow> with _$ExWindow {
   const factory ExWindow({
     required Id<ExWindow> id,
     String? name,
-    @Default([]) List<ExTabGroup> groups,
+    @Default([]) List<IdWrapper<ExTabGroup>> groups,
     @Default(0) int activeTabGroupIndex,
   }) = _ExWindow;
 
@@ -31,14 +31,14 @@ class ExWindowController extends _$ExWindowController with IdWrapperMixin<ExWind
   ExWindow build(IdWrapper<ExWindow> tabWindow) => buildById(tabWindow);
 
   @pragma('vm:prefer-inline')
-  List<ExTabGroup> _newList() => List<ExTabGroup>.from(state.groups);
+  List<IdWrapper<ExTabGroup>> _newList() => List<IdWrapper<ExTabGroup>>.from(state.groups);
 
   void addNewTabGroup([ExTabGroup? group]) {
-    final newTabGroup = group ?? ExTabGroup.create(tabs: [ExTab.create(null)]);
-    state = state.copyWith(groups: _newList()..add(newTabGroup));
+    final newTabGroup = group ?? ExTabGroup.create(tabs: [ExTab.create(null).wrap()]);
+    state = state.copyWith(groups: (_newList()..add(newTabGroup.wrap())));
   }
 
-  void removeTabGroup(ExTabGroup tabGroup) {
+  void removeTabGroup(IdWrapper<ExTabGroup> tabGroup) {
     state = state.copyWith(groups: _newList()..remove(tabGroup));
   }
 
@@ -50,7 +50,7 @@ class ExWindowController extends _$ExWindowController with IdWrapperMixin<ExWind
         activeTabGroupIndex: index,
         groups:
             _newList() //
-              ..[currentIdx] = current.copyWith(isActive: false),
+              ..[currentIdx] = update<ExTabGroup>(current, (v) => v.copyWith(isActive: false)),
       );
     }
   }

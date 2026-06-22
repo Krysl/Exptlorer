@@ -1,9 +1,9 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart' show Icons;
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:window_manager/window_manager.dart';
 
+import 'model/id.dart';
 import 'model/window.dart';
 import 'model/workspace.dart';
 import 'model/workspace_list.dart';
@@ -11,6 +11,7 @@ import 'setting/theme/theme.dart';
 import 'utils/log.dart';
 import 'view/home.dart';
 import 'view/log_settings_page.dart';
+import 'widgets/hover_visible.dart';
 import 'window.dart';
 
 class Navigation extends ConsumerStatefulWidget {
@@ -25,6 +26,7 @@ class _NavigationState extends ConsumerState<Navigation> {
   final viewKey = GlobalKey<NavigationViewState>(debugLabel: 'Navigation View Key');
   final searchFocusNode = FocusNode();
   final searchController = TextEditingController();
+  final newWorkspaceController = TextEditingController();
 
   @override
   void dispose() {
@@ -37,7 +39,7 @@ class _NavigationState extends ConsumerState<Navigation> {
   int _index = 0;
 
   List<NavigationPaneItem> _buildTabGroupPanes(ExWorkspace data) {
-    final wins = data.windows.map((window) => ref.watch(exWindowControllerProvider(window.wrap()))).toList();
+    final wins = data.windows.map((window) => ref.watch(exWindowControllerProvider(window))).toList();
     return wins.map(
       (win) {
         final window = ref.watch(exWindowControllerProvider(win.wrap()));
@@ -47,6 +49,7 @@ class _NavigationState extends ConsumerState<Navigation> {
           infoBadge: InfoBadge(source: Text('${window.groups.length}标签页组')),
           body: HomePage(
             window: window.wrap(),
+            workspaceId: data.wrap(),
           ),
           items: window.groups
               .map(
@@ -61,33 +64,28 @@ class _NavigationState extends ConsumerState<Navigation> {
     ).toList();
   }
 
-  NavigationPaneItem _buildWorkspacePane(String name) {
-    final w = ref.watch(exWorkspaceControllerProvider(name));
+  NavigationPaneItem _buildWorkspacePane(IdWrapper<ExWorkspace> id, ExWorkspaceListController wsCtl) {
+    final w = ref.watch(exWorkspaceControllerProvider(id));
     return PaneItemExpander(
-      title: Text(name),
+      title: Row(
+        mainAxisAlignment: .spaceBetween,
+        children: [
+          Text(w.name),
+          HoverVisible(
+            child: FilledButton(
+              onPressed: () {
+                wsCtl.removeWorkspace(id);
+              },
+              child: const Text('删除'),
+            ),
+          ),
+        ],
+      ),
       icon: const WindowsIcon(FluentIcons.folder_list),
       infoBadge: InfoBadge(
-        source: w.when(
-          data: (data) {
-            return Text('${data.windows.length}窗口');
-          },
-          error: (error, stackTrace) {
-            return null;
-          },
-          loading: () {
-            return null;
-          },
-        ),
+        source: Text('${w.windows.length}窗口'),
       ),
-      items: w.when(
-        data: _buildTabGroupPanes,
-        error: (error, stackTrace) {
-          return [];
-        },
-        loading: () {
-          return [_loaddingItem];
-        },
-      ),
+      items: _buildTabGroupPanes(w),
     );
   }
 
@@ -95,15 +93,31 @@ class _NavigationState extends ConsumerState<Navigation> {
   @override
   Widget build(BuildContext context) {
     final ws = ref.watch(exWorkspaceListControllerProvider);
+    final wsCtl = ref.read(exWorkspaceListControllerProvider.notifier);
     final appThemeData = ref.watch(appThemeProvider);
     final appTheme = ref.watch(appThemeProvider.notifier);
     final theme = FluentTheme.of(context);
 
     final paneItems = ws.when<List<NavigationPaneItem>>(
-      data: (data) {
-        return data.workspaces.map(_buildWorkspacePane).toList();
-      },
-      error: (err, st) => [],
+      data: (data) => [
+        ...data.workspaces.map((ws) => _buildWorkspacePane(ws, wsCtl)),
+        PaneItem(
+          title: TextBox(
+            controller: newWorkspaceController,
+            placeholder: '输入工作区名称',
+            suffixMode: .editing,
+            suffix: FilledButton(
+              onPressed: () {
+                wsCtl.addNewWorkspace(name: newWorkspaceController.text);
+              },
+              child: const Text('新建'),
+            ),
+            onSubmitted: (value) => wsCtl.addNewWorkspace(name: value),
+            // icon: const WindowsIcon(WindowsIcons.add),
+          ),
+        ),
+      ],
+      error: (err, st) => [PaneItem(icon: const WindowsIcon(WindowsIcons.error))],
       loading: () => [_loaddingItem],
     );
 

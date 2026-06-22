@@ -89,10 +89,10 @@ class MillerColumnsController extends _$MillerColumnsController {
     });
     final millerColumnListState = MillerColumnListState.init(tab);
     ref.onDispose(() {
-      log.debugEx('uri: ${uri}', title: 'Miller', tags: ['miller', 'dispose']);
+      log.debugEx('uri: $uri', title: 'Miller', tags: ['miller', 'dispose']);
       millerColumnListState.focusNode.dispose();
     });
-    log.debugEx('uri: ${uri}', title: 'Miller', tags: ['miller', 'build']);
+    log.debugEx('uri: $uri', title: 'Miller', tags: ['miller', 'build']);
     return millerColumnListState;
   }
 

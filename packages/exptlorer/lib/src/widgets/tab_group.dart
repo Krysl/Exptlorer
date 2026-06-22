@@ -58,8 +58,8 @@ class TabGroupWidget extends ConsumerWidget {
             closeButtonVisibility: .onHover,
             footer: tabsEndIcon,
             tabs: tabsGroup.tabs.mapIndexed(
-              (index, tab2) {
-                final tab = ref.watch(exTabControllerProvider(tab2.wrap()));
+              (index, tabid) {
+                final tab = ref.watch(exTabControllerProvider(tabid));
                 final pathSegments = tab.uri?.toFilePath().split(r'\');
                 return Tab(
                   text: TabTitle(tab: tab, isActive: tabsGroup.activeTabIndex == index),

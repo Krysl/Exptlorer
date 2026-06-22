@@ -1,6 +1,12 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
+
+import 'tab.dart';
+import 'tab_group.dart';
+import 'window.dart';
+import 'workspace.dart';
 
 part 'id.g.dart';
 
@@ -9,7 +15,8 @@ const uuid = Uuid();
 extension type Id<T>(UuidValue id) {
   factory Id.create() => Id(uuid.v7obj());
   factory Id.fromJson(Map<String, Object?> json) => Id(UuidValue.fromString(json['id']! as String));
-  Map<String, dynamic> toJson() => {'id': id.toString()};
+  factory Id.fromString(String str) => Id(UuidValue.fromString(str));
+  Map<String, dynamic> toJson() => {'id': id.toString(), 'type': T.toString()};
 }
 
 abstract class IdBase<T extends IdBase<T>> {
@@ -31,11 +38,57 @@ mixin IdWrapperMixin<T extends IdBase<T>> on $Notifier<T> {
     // });
     return tab._value;
   }
+
+  IdWrapper<R> update<R extends IdBase<R>>(IdWrapper<R> id, R Function(R) fn) {
+    return fn(id._value).wrap();
+  }
 }
+mixin AsyncIdWrapperMixin<T extends IdBase<T>> on $AsyncNotifier<T> {
+  T buildById(IdWrapper<T> tab) {
+    // final ids = ref.read(idControllerProvider<T>().notifier);
+    // idTypes.add(T);
+    // listenSelf((prev, next) {
+    //   ids.update(next.id, next);
+    // });
+    return tab._value;
+  }
+
+  IdWrapper<R> updateValue<R extends IdBase<R>>(IdWrapper<R> id, R Function(R) fn) {
+    return fn(id._value).wrap();
+  }
+}
+
+typedef FromJson = IdBase Function(Map<String, Object?>);
+
+final fromMap = <String, FromJson>{
+  'ExWorkspace': ExWorkspace.fromJson,
+  'ExWindow': ExWindow.fromJson,
+  'ExTabGroup': ExTabGroup.fromJson,
+  'ExTab': ExTab.fromJson,
+};
+
+final keyTypeMap = {'tabs': 'ExTabGroup', 'uri': 'ExTab'};
 
 @immutable
 class IdWrapper<T extends IdBase<T>> {
   const IdWrapper(this._value);
+
+  factory IdWrapper.fromJson(Map<String, Object?> json) {
+    var value = json['value'] as Map<String, Object?>?;
+    var type = json['type'] as String?;
+
+    if (value == null) {
+      final key = keyTypeMap.keys.firstWhereOrNull((key) => json.containsKey(key));
+      if (key != null) {
+        value = json;
+        type = keyTypeMap[key];
+      }
+    }
+    final t = fromMap[type]!.call(value!) as T;
+    return IdWrapper(t);
+  }
+  Map<String, dynamic> toJson() => {'type': T.toString(), 'value': _value.toJson()};
+
   final T _value;
 
   @override
@@ -48,6 +101,8 @@ class IdWrapper<T extends IdBase<T>> {
 
   @override
   String toString() => 'IdWrapper<$T>($_value)';
+
+  Id<T> get id => _value.id;
 }
 
 class IdCollection<T extends IdBase<T>> {

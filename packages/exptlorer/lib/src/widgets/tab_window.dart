@@ -27,7 +27,7 @@ class _TabWindowState extends ConsumerState<TabWindow> {
         .map(
           (group) => Expanded(
             child: TabGroupWidget(
-              tabGroupId: group.wrap(),
+              tabGroupId: group,
               drives: widget.drives,
               tabsEndIcon: Row(
                 children: [
