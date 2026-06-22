@@ -12,7 +12,7 @@ class SaveWorkspaceIntent extends Intent {
 class SaveWorkspaceAction extends Action<SaveWorkspaceIntent> {
   SaveWorkspaceAction({required this.controller, required this.name});
 
-  final WorkspaceController controller;
+  final ExWorkspaceController controller;
   final String name;
 
   @override

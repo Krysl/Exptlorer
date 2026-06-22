@@ -1,8 +1,12 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart' show Icons;
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:window_manager/window_manager.dart';
 
+import 'model/window.dart';
+import 'model/workspace.dart';
+import 'model/workspace_list.dart';
 import 'setting/theme/theme.dart';
 import 'utils/log.dart';
 import 'view/home.dart';
@@ -32,13 +36,80 @@ class _NavigationState extends ConsumerState<Navigation> {
 
   int _index = 0;
 
+  List<NavigationPaneItem> _buildTabGroupPanes(ExWorkspace data) {
+    final wins = data.windows.map((window) => ref.watch(exWindowControllerProvider(window.wrap()))).toList();
+    return wins.map(
+      (win) {
+        final window = ref.watch(exWindowControllerProvider(win.wrap()));
+        return PaneItemExpander(
+          icon: const WindowsIcon(FluentIcons.tab_two_column), //
+          title: Text(window.name ?? window.id.toString()),
+          infoBadge: InfoBadge(source: Text('${window.groups.length}标签页组')),
+          body: HomePage(
+            window: window.wrap(),
+          ),
+          items: window.groups
+              .map(
+                (group) => PaneItem(
+                  icon: const WindowsIcon(FluentIcons.column),
+                  title: Text(group.id.toString()),
+                ),
+              )
+              .toList(),
+        );
+      },
+    ).toList();
+  }
+
+  NavigationPaneItem _buildWorkspacePane(String name) {
+    final w = ref.watch(exWorkspaceControllerProvider(name));
+    return PaneItemExpander(
+      title: Text(name),
+      icon: const WindowsIcon(FluentIcons.folder_list),
+      infoBadge: InfoBadge(
+        source: w.when(
+          data: (data) {
+            return Text('${data.windows.length}窗口');
+          },
+          error: (error, stackTrace) {
+            return null;
+          },
+          loading: () {
+            return null;
+          },
+        ),
+      ),
+      items: w.when(
+        data: _buildTabGroupPanes,
+        error: (error, stackTrace) {
+          return [];
+        },
+        loading: () {
+          return [_loaddingItem];
+        },
+      ),
+    );
+  }
+
+  final _loaddingItem = PaneItem(icon: const WindowsIcon(FluentIcons.refresh));
   @override
   Widget build(BuildContext context) {
+    final ws = ref.watch(exWorkspaceListControllerProvider);
     final appThemeData = ref.watch(appThemeProvider);
     final appTheme = ref.watch(appThemeProvider.notifier);
     final theme = FluentTheme.of(context);
+
+    final paneItems = ws.when<List<NavigationPaneItem>>(
+      data: (data) {
+        return data.workspaces.map(_buildWorkspacePane).toList();
+      },
+      error: (err, st) => [],
+      loading: () => [_loaddingItem],
+    );
+
     return NavigationView(
       key: viewKey,
+      onDisplayModeChanged: (mode) {},
       titleBar: TitleBar(
         icon: const FlutterLogo(),
         title: Text(widget.appTitle),
@@ -127,13 +198,7 @@ class _NavigationState extends ConsumerState<Navigation> {
           }
         }(),
 
-        items: [
-          PaneItem(
-            icon: const WindowsIcon(WindowsIcons.home),
-            title: const Text('Home'),
-            body: const HomePage(),
-          ),
-        ],
+        items: paneItems,
         footerItems: [
           PaneItem(
             icon: const Icon(FluentIcons.settings),

@@ -3,11 +3,15 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../actions/workspace.dart';
 import '../model/drives.dart';
+import '../model/id.dart';
+import '../model/window.dart';
 import '../model/workspace.dart';
 import '../widgets/tab_window.dart';
 
 class HomePage extends ConsumerStatefulWidget {
-  const HomePage({super.key});
+  const HomePage({super.key, required this.window});
+
+  final IdWrapper<ExWindow> window;
 
   @override
   ConsumerState<HomePage> createState() => _HomePageState();
@@ -17,15 +21,9 @@ class _HomePageState extends ConsumerState<HomePage> {
   @override
   Widget build(BuildContext context) {
     final drivesData = ref.watch(drivesControllerProvider);
-    final window = ref.watch(
-      workspaceControllerProvider('Default').select((ctl) {
-        return ctl.value?.windows.first;
-      }),
-    );
-    final workspaceCtl = ref.read(workspaceControllerProvider('Default').notifier);
-    if (window == null) {
-      return const ProgressRing();
-    }
+    final window = ref.watch(exWindowControllerProvider(widget.window));
+    final workspaceCtl = ref.read(exWorkspaceControllerProvider('Default').notifier);
+
     return drivesData.when(
       loading: ProgressRing.new,
       error: (err, st) => Text('$err'),

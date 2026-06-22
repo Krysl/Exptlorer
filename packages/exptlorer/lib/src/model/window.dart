@@ -12,6 +12,7 @@ part 'window.g.dart';
 abstract class ExWindow extends IdBase<ExWindow> with _$ExWindow {
   const factory ExWindow({
     required Id<ExWindow> id,
+    String? name,
     @Default([]) List<ExTabGroup> groups,
     @Default(0) int activeTabGroupIndex,
   }) = _ExWindow;

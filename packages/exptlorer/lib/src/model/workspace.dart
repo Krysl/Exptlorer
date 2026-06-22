@@ -30,22 +30,27 @@ abstract class ExWorkspace extends IdBase<ExWorkspace> with _$ExWorkspace {
   factory ExWorkspace.fromJson(Map<String, Object?> json) => _$ExWorkspaceFromJson(json);
   @override
   ExWorkspace trueState(Ref ref) {
-    final read = ref.read(workspaceControllerProvider(name));
+    final read = ref.read(exWorkspaceControllerProvider(name));
     return read.requireValue;
   }
 }
 
-@Riverpod(keepAlive: true)
-class WorkspaceController extends _$WorkspaceController {
-  Future<File> _getFileByName(String name) async {
-    final dir = await getApplicationDocumentsDirectory();
-    final file = File(path.join(dir.path, appTitle, '$name.json'));
-    return file;
-  }
+Future<Directory> workspaceSavedFolder() async {
+  final dir = await getApplicationDocumentsDirectory();
+  final workDir = Directory(path.join(dir.path, appTitle, 'workspaces'));
+  return workDir;
+}
 
+Future<File> getWorkspaceFileByName(String name) async {
+  final dir = await workspaceSavedFolder();
+  return File(path.join(dir.path, '$name.json'));
+}
+
+@Riverpod(keepAlive: true)
+class ExWorkspaceController extends _$ExWorkspaceController {
   @override
   Future<ExWorkspace> build(String name) async {
-    final file = await _getFileByName(name);
+    final file = await getWorkspaceFileByName(name);
     if (file.existsSync()) {
       final json = await file.readAsString();
       try {
@@ -60,6 +65,7 @@ class WorkspaceController extends _$WorkspaceController {
       windows: [
         ExWindow(
           id: Id.create(),
+          name: 'default',
           groups: [
             ExTabGroup(
               id: Id.create(),
@@ -74,7 +80,7 @@ class WorkspaceController extends _$WorkspaceController {
   }
 
   Future<void> save(String name) async {
-    final file = await _getFileByName(name);
+    final file = await getWorkspaceFileByName(name);
     final data = state.requireValue;
     final jsonData = data.toJson();
     log.debugEx('save to ${file.path}: $jsonData', title: 'WorkspaceController', tags: ['workspace', 'save']);

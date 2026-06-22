@@ -30,7 +30,7 @@ abstract class AppThemeData with _$AppThemeData {
   const factory AppThemeData({
     required AccentColor color,
     @Default(ThemeMode.system) ThemeMode mode,
-    @Default(PaneDisplayMode.auto) PaneDisplayMode displayMode,
+    @Default(PaneDisplayMode.compact) PaneDisplayMode displayMode,
     @Default(NavigationIndicators.sticky) NavigationIndicators indicator,
     @Default(WindowEffect.disabled) WindowEffect windowEffect,
     @Default(TextDirection.ltr) TextDirection textDirection,
