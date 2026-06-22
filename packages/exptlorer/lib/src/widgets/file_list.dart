@@ -42,7 +42,7 @@ class _FileItemState extends ConsumerState<FileItem> {
         children: [
           if (!isMin)
             SizedBox(
-              width: widget.width >= 40 ? 32 : 16,
+              width: widget.width >= 80 ? 32 : 16,
               height: 32,
               child: img.when(
                 data: (data) => RawImage(image: data),

@@ -99,7 +99,14 @@ class _DriveItemState extends ConsumerState<DriveItem> {
     return widget.size.whens(
       widget.width, //
       min: [Text(driveName)],
-      small: [Text(driveName)],
+      small: [
+        Text(driveName),
+        const Spacer(),
+        if (widget.width > 64)
+          Text(
+            '${((widget.drive.totalSpace - widget.drive.availableSpace) / widget.drive.totalSpace * 100).toStringAsFixed(0)}% ',
+          ),
+      ],
       max: [
         Expanded(
           child: Row(
