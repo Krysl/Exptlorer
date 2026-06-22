@@ -7,6 +7,7 @@ import '../model/id.dart';
 import '../model/tab.dart';
 import '../model/tab_group.dart';
 import '../utils/log.dart';
+import 'hover_text.dart';
 import 'miller_columns.dart';
 
 class TabGroupWidget extends ConsumerWidget {
@@ -57,14 +58,36 @@ class TabGroupWidget extends ConsumerWidget {
             closeButtonVisibility: .onHover,
             footer: tabsEndIcon,
             tabs: tabsGroup.tabs.mapIndexed(
-              (index, tab) {
+              (index, tab2) {
+                final tab = ref.watch(exTabControllerProvider(tab2.wrap()));
+                final pathSegments = tab.uri?.toFilePath().split(r'\');
                 return Tab(
                   text: TabTitle(tab: tab, isActive: tabsGroup.activeTabIndex == index),
                   selectedBackgroundColor: bgColor(isSel: true),
                   backgroundColor: bgColor(isSel: false),
-                  body: MillerColumns(
-                    tab: tab.wrap(), //
-                    drives: drives,
+                  body: Column(
+                    children: [
+                      if (pathSegments != null)
+                        Padding(
+                          padding: const .symmetric(horizontal: 8, vertical: 2),
+                          child: BreadcrumbBar(
+                            items: pathSegments
+                                .mapIndexed((i, s) => BreadcrumbItem(label: HoverText(s), value: i))
+                                .toList(),
+                            onItemPressed: (value) {
+                              ref
+                                  .read(exTabControllerProvider(tab.wrap()).notifier)
+                                  .updateUri(.file(pathSegments.sublist(0, value.value + 1).join(r'\')));
+                            },
+                          ),
+                        ),
+                      Expanded(
+                        child: MillerColumns(
+                          tab: tab.wrap(), //
+                          drives: drives,
+                        ),
+                      ),
+                    ],
                   ),
                   onClosed: () {
                     tabsGroupCtl.removeTab(tab);

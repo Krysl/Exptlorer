@@ -77,6 +77,7 @@ class MillerColumnsController extends _$MillerColumnsController {
   @override
   MillerColumnListState build(IdWrapper<ExTab> tabId) {
     final t = ref.read(exTabControllerProvider(tabId).notifier);
+    final uri = ref.watch(exTabControllerProvider(tabId).select((t) => t.uri));
     final tab = ref.read(exTabControllerProvider(tabId));
     listenSelf((prev, next) {
       unawaited(
@@ -86,12 +87,13 @@ class MillerColumnsController extends _$MillerColumnsController {
         }),
       );
     });
+    final millerColumnListState = MillerColumnListState.init(tab);
     ref.onDispose(() {
-      log.debugEx('uri: ${tab.uri}', title: 'Miller', tags: ['miller', 'dispose']);
-      state.focusNode.dispose();
+      log.debugEx('uri: ${uri}', title: 'Miller', tags: ['miller', 'dispose']);
+      millerColumnListState.focusNode.dispose();
     });
-    log.debugEx('uri: ${tab.uri}', title: 'Miller', tags: ['miller', 'build']);
-    return MillerColumnListState.init(tab);
+    log.debugEx('uri: ${uri}', title: 'Miller', tags: ['miller', 'build']);
+    return millerColumnListState;
   }
 
   List<MillerColumnLayout> calcWidths(

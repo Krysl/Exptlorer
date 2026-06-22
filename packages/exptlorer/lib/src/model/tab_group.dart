@@ -24,6 +24,8 @@ abstract class ExTabGroup extends IdBase<ExTabGroup> with _$ExTabGroup {
 
   @override
   ExTabGroup trueState(Ref ref) => ref.read(exTabGroupControllerProvider(wrap()));
+
+ ExTab get activeTab => tabs[activeTabIndex];
 }
 
 @Riverpod(keepAlive: true)
