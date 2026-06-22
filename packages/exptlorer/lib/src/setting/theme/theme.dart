@@ -78,4 +78,12 @@ class AppTheme extends _$AppTheme {
     ),
     fontFamily: kIsWeb ? 'Segoe UI' : null,
   );
+
+  void setDisplayMode(PaneDisplayMode displayMode) {
+    if (displayMode != state.displayMode) {
+      state = state.copyWith(displayMode: displayMode);
+    }
+  }
+
+  PaneDisplayMode getDisplayMode() => state.displayMode;
 }

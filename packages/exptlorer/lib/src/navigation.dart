@@ -181,6 +181,7 @@ class _NavigationState extends ConsumerState<Navigation> {
       ),
       pane: NavigationPane(
         selected: _index,
+        toggleButtonPosition: .titleBar,
         onChanged: (index) {
           log.debug('Changed to $index');
           setState(() => _index = index);

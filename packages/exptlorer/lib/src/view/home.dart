@@ -1,7 +1,7 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../actions/workspace.dart';
+import '../actions/actions.dart';
 import '../model/drives.dart';
 import '../model/id.dart';
 import '../model/window.dart';

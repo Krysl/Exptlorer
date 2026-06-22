@@ -1,2 +1,2 @@
-# Exptlorer
-Exptlorer = `Experimental Explorer`
+# *Exp*ᵗlorer
+*Exp*ᵗlorer = `Experimental Explorer`
